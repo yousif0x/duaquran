@@ -1,18 +1,43 @@
 {
-  "name": "أذكاري - رفيقك اليومي للأذكار والزيارات",
+  "name": "أذكاري - رفيقك الإسلامي اليومي",
   "short_name": "أذكاري",
-  "description": "تطبيق وموقع أذكاري للطلاب والمسلمين - أذكار، أدعية، زيارة عاشوراء ومتابعة يومية",
+  "description": "تطبيق إسلامي للأذكار والأدعية والختمة القرآنية الشهرية والإشعارات اليومية",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#064e3b",
-  "theme_color": "#0d6e4f",
+  "orientation": "portrait",
+  "background_color": "#0a1628",
+  "theme_color": "#10b981",
   "dir": "rtl",
   "lang": "ar",
+  "categories": ["religion", "education", "lifestyle"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☪</text></svg>",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml"
+      "src": "data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230d6e4f'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='300' fill='%23fbbf24'>☪</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230d6e4f'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='300' fill='%23fbbf24'>☪</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "الأذكار",
+      "url": "./index.html#salah",
+      "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='1em' font-size='40'>🕌</text></svg>", "sizes": "48x48"}]
+    },
+    {
+      "name": "القرآن",
+      "url": "./index.html#quran",
+      "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='1em' font-size='40'>📖</text></svg>", "sizes": "48x48"}]
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
