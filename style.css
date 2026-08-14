@@ -1114,3 +1114,47 @@ body.dark .ziyarat-text { background:#0d0d0d; }
 .story-text { font-size:.9rem; line-height:1.7; color:var(--muted); margin-bottom:1rem; }
 .story-footer { display:flex; justify-content:space-between; align-items:center; }
 .story-badge { font-size:.75rem; background:var(--bg2); color:var(--g3); padding:.3rem .6rem; border-radius:var(--r-sm); font-weight:700; }
+
+/* ══════ RESPONSIVE DESKTOP LAYOUT (PC / LAPTOP / IPAD) ══════ */
+@media (min-width: 768px) {
+  body {
+    display: flex;
+    justify-content: center;
+    background: #cbd5e1;
+    background-image: radial-gradient(#94a3b8 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  body.dark {
+    background: #020617;
+    background-image: radial-gradient(#1e293b 1px, transparent 1px);
+  }
+  .app {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 60px rgba(0,0,0,0.15);
+    background: var(--bg);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  .hero, .overlay {
+    width: 100%;
+    max-width: 480px;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+  .navbar, .tab-bar {
+    max-width: 480px;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+  .install-banner {
+    max-width: 456px;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+}
