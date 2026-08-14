@@ -39,7 +39,6 @@
       <span class="hero-badge">🤲 أدعية شاملة</span>
       <span class="hero-badge">🏴 عاشوراء</span>
       <span class="hero-badge">⭐ استخارة</span>
-      <span class="hero-badge">🔔 إشعارات حقيقية</span>
     </div>
     <button class="btn-hero-start" type="button" onclick="window.launchApp ? window.launchApp() : (document.getElementById('hero').style.display='none', document.getElementById('app').classList.remove('hidden'))">✨ ابدأ يومك بسم الله</button>
   </div>
@@ -56,7 +55,9 @@
     </div>
     <div class="nav-right">
       <div class="nav-streak" title="أيام متتالية">🔥 <span id="nav-streak-num">0</span></div>
+      <div class="nav-hijri" id="nav-hijri" title="التاريخ الهجري"></div>
       <button class="nav-btn" id="btn-dark" onclick="toggleDark()" title="وضع ليلي">🌙</button>
+      <button class="nav-btn" onclick="openThemePicker()" title="تغيير الثيم">🎨</button>
       <button class="nav-btn" onclick="go('ai')" title="المساعد الذكي">🤖</button>
       <button class="nav-btn" onclick="openTasbih()" title="سبحة رقمية">📿</button>
       <button class="nav-btn" onclick="openReminder()" title="إشعارات">🔔</button>
@@ -81,12 +82,25 @@
     <button class="tab-btn active" data-tab="salah"    onclick="go('salah')">   <span class="ti">🕌</span><span>الصلاة</span></button>
     <button class="tab-btn"        data-tab="quran"    onclick="go('quran')">   <span class="ti">📖</span><span>القرآن</span></button>
     <button class="tab-btn"        data-tab="duaa"     onclick="go('duaa')">    <span class="ti">🤲</span><span>الأدعية</span></button>
+    <button class="tab-btn"        data-tab="qibla"    onclick="go('qibla')">   <span class="ti">🗺️</span><span>القبلة</span></button>
+    <button class="tab-btn"        data-tab="ramadan"  onclick="go('ramadan')"> <span class="ti">🌙</span><span>رمضان</span></button>
     <button class="tab-btn"        data-tab="istikhara" onclick="go('istikhara')"><span class="ti">⭐</span><span>الاستخارة</span></button>
     <button class="tab-btn"        data-tab="ai"        onclick="go('ai')">       <span class="ti">🤖</span><span>المساعد الذكي</span></button>
     <button class="tab-btn"        data-tab="ashura"   onclick="go('ashura')">  <span class="ti">🏴</span><span>عاشوراء</span></button>
     <button class="tab-btn"        data-tab="suwar"    onclick="go('suwar')">   <span class="ti">✨</span><span>السور</span></button>
     <button class="tab-btn"        data-tab="sleep"    onclick="go('sleep')">   <span class="ti">🌙</span><span>النوم</span></button>
+    <button class="tab-btn"        data-tab="stories"  onclick="go('stories')"> <span class="ti">📚</span><span>قصص</span></button>
     <button class="tab-btn"        data-tab="tracker"  onclick="go('tracker')"> <span class="ti">✅</span><span>متابعتي</span></button>
+    <button class="tab-btn"        data-tab="stats"    onclick="go('stats')">   <span class="ti">📊</span><span>إحصائياتي</span></button>
+  </div>
+
+  <!-- GLOBAL SEARCH -->
+  <div class="global-search-wrap">
+    <input type="text" id="global-search-input" class="global-search"
+      placeholder="🔍 ابحث في الأدعية والأذكار والسور..."
+      oninput="globalSearch(this.value)"
+      autocomplete="off" spellcheck="false"/>
+    <div id="global-search-results" class="global-search-results hidden"></div>
   </div>
 
   <main class="main">
@@ -221,6 +235,17 @@
         <div class="khatmah-grid-label">تقدم الختمة:</div>
         <div class="khatmah-30grid" id="kh-grid"></div>
         <button class="khatmah-reset-btn" onclick="resetKhatmah()">🔄 إعادة الختمة من الأول</button>
+        <!-- إحصائيات الختمة التراكمية -->
+        <div id="khatmah-stats-row"></div>
+      </div>
+
+      <!-- الختمة المشتركة عبر واتساب -->
+      <div class="card" style="border-color:var(--g3)">
+        <div class="duaa-title">👥 الختمة المشتركة</div>
+        <p style="font-size:.9rem;color:var(--muted);margin-bottom:1rem">شارك الأجر وقم بعمل ختمة قرآنية جماعية بتوزيع الأجزاء الـ 30 على أفراد عائلتك أو أصدقائك عبر الواتساب.</p>
+        <button class="btn btn-whatsapp" style="width:100%;justify-content:center;padding:1rem;font-size:1.1rem" onclick="generateSharedKhatmah()">
+          🤍 أنشئ رسالة الختمة المشتركة
+        </button>
       </div>
 
       <!-- Reciters -->
@@ -240,8 +265,35 @@
     <section id="tab-duaa" class="tab-content">
       <div class="sec-header">
         <span class="sec-icon">🤲</span>
-        <h2>الأدعية والأوراد</h2>
+        <h2>الأدعية والأوراد والرقية</h2>
         <p>﴿ ادْعُونِي أَسْتَجِبْ لَكُمْ ﴾ – غافر: ٦٠</p>
+      </div>
+
+      <!-- الرقية الشرعية -->
+      <div class="card" style="border-color:var(--blue); background:linear-gradient(to bottom, var(--card), rgba(59, 130, 246, 0.05))">
+        <div class="duaa-title" style="color:var(--blue)">🛡️ الرقية الشرعية الشاملة</div>
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">حصن نفسك وأهل بيتك من العين والحسد والسحر بقراءة الرقية أو الاستماع إليها.</p>
+        
+        <!-- مشغل الرقية الصوتي -->
+        <div style="background:var(--bg2);padding:1rem;border-radius:var(--r-sm);margin-bottom:1rem;text-align:center">
+          <div style="font-weight:700;margin-bottom:.5rem;font-size:.9rem">🎧 استمع للرقية الشرعية (سورة البقرة - العفاسي)</div>
+          <audio controls preload="none" style="width:100%;height:40px" src="https://server8.mp3quran.net/afs/002.mp3"></audio>
+        </div>
+
+        <!-- آيات الرقية -->
+        <div class="steps-list" style="margin-bottom:1rem">
+          <div class="step-row"><div class="step-num" style="background:var(--blue)">١</div><div class="step-text"><strong>سورة الفاتحة</strong> (تُقرأ 7 مرات)</div></div>
+          <div class="step-row"><div class="step-num" style="background:var(--blue)">٢</div><div class="step-text"><strong>آية الكرسي</strong> (البقرة 255)</div></div>
+          <div class="step-row"><div class="step-num" style="background:var(--blue)">٣</div><div class="step-text"><strong>أواخر سورة البقرة</strong> (الآيتان 285 و 286)</div></div>
+          <div class="step-row"><div class="step-num" style="background:var(--blue)">٤</div><div class="step-text"><strong>المعوذات</strong> (الإخلاص، الفلق، الناس - 3 مرات لكل منها)</div></div>
+        </div>
+
+        <div class="ashura-duaa">
+          <div class="ashura-duaa-title">أدعية التحصين المأثورة</div>
+          <div class="ashura-duaa-text">«أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ» (3 مرات)
+«بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ، وَهُوَ السَّمِيعُ الْعَلِيمُ» (3 مرات)
+«أُعِيذُكَ بِكَلِمَاتِ اللَّهِ التَّامَّةِ، مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ، وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ»</div>
+        </div>
       </div>
 
       <!-- Wird of the Day -->
@@ -591,6 +643,160 @@
 
       <div class="checklist" id="checklist"></div>
       <button class="btn-new-day" onclick="newDay()">🔄 بداية يوم جديد</button>
+
+      <!-- زر مشاركة التقدم -->
+      <button class="btn-share-progress" onclick="openShareCard()">📸 شارك تقدمك اليوم</button>
+    </section>
+
+    <!-- ══════ TAB: القبلة ══════ -->
+    <section id="tab-qibla" class="tab-content">
+      <div class="sec-header">
+        <span class="sec-icon">🗺️</span>
+        <h2>اتجاه القبلة</h2>
+        <p>يستخدم GPS الجهاز لتحديد اتجاه الكعبة المشرفة</p>
+      </div>
+
+      <!-- بطاقة التاريخ الهجري -->
+      <div class="hijri-card" id="hijri-card">
+        <div class="hijri-icon">☪</div>
+        <div class="hijri-date" id="hijri-date-big">جارٍ التحميل...</div>
+        <div class="hijri-occasion" id="hijri-occasion"></div>
+        <div class="hijri-greg" id="hijri-greg"></div>
+      </div>
+
+      <!-- البوصلة -->
+      <div class="qibla-wrap">
+        <div class="qibla-compass-outer">
+          <div class="qibla-compass" id="qibla-compass">
+            <div class="compass-rose">
+              <span class="compass-n">ش</span>
+              <span class="compass-s">ج</span>
+              <span class="compass-e">ش</span>
+              <span class="compass-w">غ</span>
+            </div>
+            <div class="qibla-needle" id="qibla-needle">
+              <div class="needle-top">🕋</div>
+              <div class="needle-bottom"></div>
+            </div>
+            <div class="compass-center"></div>
+          </div>
+        </div>
+        <div class="qibla-info">
+          <div class="qibla-angle" id="qibla-angle">-- °</div>
+          <div class="qibla-label">اتجاه القبلة من موقعك</div>
+          <div class="qibla-location" id="qibla-location">جارٍ تحديد الموقع...</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1rem" onclick="initQibla()">📍 تحديد موقعي</button>
+      </div>
+
+      <!-- تنبيه الجمعة -->
+      <div class="friday-card" id="friday-card">
+        <div class="friday-icon">🕌</div>
+        <div class="friday-title">يوم الجمعة المبارك</div>
+        <div class="friday-body" id="friday-body">جارٍ الفحص...</div>
+        <div class="friday-actions">
+          <button class="btn btn-primary" onclick="go('suwar')">📖 اقرأ سورة الكهف</button>
+          <button class="btn btn-ghost"   onclick="fridayShareWhatsApp()">🤝 شارك مع الأهل</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ TAB: رمضان ══════ -->
+    <section id="tab-ramadan" class="tab-content">
+      <div class="sec-header">
+        <span class="sec-icon">🌙</span>
+        <h2>رمضان الكريم</h2>
+        <p>تتبع صيامك وتراويحك وأهدافك الرمضانية</p>
+      </div>
+
+      <!-- العداد التنازلي -->
+      <div class="ramadan-countdown" id="ramadan-countdown">
+        <div class="countdown-moon">🌙</div>
+        <div class="countdown-num" id="ramadan-days">--</div>
+        <div class="countdown-lbl" id="ramadan-lbl">يوم حتى رمضان</div>
+        <div class="countdown-date" id="ramadan-date"></div>
+      </div>
+
+      <!-- متابعة الصيام -->
+      <div class="ramadan-tracker-card">
+        <div class="ramadan-section-title">📅 متابعة أيام الصيام</div>
+        <div class="ramadan-grid" id="ramadan-fasting-grid"></div>
+        <div class="ramadan-stats-row">
+          <div class="ramadan-stat"><span id="rm-fasted">0</span><span>يوم صام</span></div>
+          <div class="ramadan-stat"><span id="rm-remaining">30</span><span>يوم متبقي</span></div>
+          <div class="ramadan-stat"><span id="rm-tarawih">0</span><span>تراويح</span></div>
+        </div>
+      </div>
+
+      <!-- متابعة التراويح والأهداف -->
+      <div class="ramadan-goals-card">
+        <div class="ramadan-section-title">🎯 أهداف رمضان</div>
+        <div class="ramadan-goal-row">
+          <span>🌙 صليت التراويح الليلة</span>
+          <button class="ramadan-goal-btn" id="btn-tarawih" onclick="markTarawih()">تسجيل ✓</button>
+        </div>
+        <div class="ramadan-goal-row">
+          <span>📖 ختمت جزء اليوم</span>
+          <button class="ramadan-goal-btn" id="btn-rm-quran" onclick="markRamadanQuran()">تسجيل ✓</button>
+        </div>
+        <div class="ramadan-goal-row">
+          <span>🤲 قرأت دعاء الإفطار</span>
+          <button class="ramadan-goal-btn" id="btn-rm-duaa" onclick="markRamadanDuaa()">تسجيل ✓</button>
+        </div>
+      </div>
+
+      <!-- دعاء الإفطار -->
+      <div class="card" style="border-color:var(--gold)">
+        <span class="badge" style="background:var(--gold);color:#000">🌙 دعاء الإفطار</span>
+        <div class="ayah-text">اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ، ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ.</div>
+        <div class="card-actions">
+          <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
+          <button class="btn-whatsapp" onclick="shareWhatsApp('اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ، ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ','دعاء الإفطار')">🤍 واتساب</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ TAB: إحصائياتي ══════ -->
+    <section id="tab-stats" class="tab-content">
+      <div class="sec-header">
+        <span class="sec-icon">📊</span>
+        <h2>إحصائياتي</h2>
+        <p>نظرة شاملة على مسيرتك الروحية</p>
+      </div>
+
+      <!-- أرقام سريعة -->
+      <div class="stats-quick-grid" id="stats-quick-grid"></div>
+
+      <!-- رسم النشاط الأسبوعي -->
+      <div class="stats-card">
+        <div class="stats-card-title">📈 نشاطك هذا الأسبوع</div>
+        <div class="weekly-chart" id="weekly-chart"></div>
+      </div>
+
+      <!-- أكثر ذكر استخدمته -->
+      <div class="stats-card">
+        <div class="stats-card-title">📿 أكثر أذكارك تكراراً</div>
+        <div id="top-dhikr-list"></div>
+      </div>
+
+      <!-- الإنجازات -->
+      <div class="stats-card">
+        <div class="stats-card-title">🏆 إنجازاتي</div>
+        <div class="achievements-grid" id="achievements-grid"></div>
+      </div>
+    </section>
+
+    <!-- ══════ TAB: مكتبة القصص ══════ -->
+    <section id="tab-stories" class="tab-content">
+      <div class="sec-header">
+        <span class="sec-icon">📚</span>
+        <h2>السيرة وقصص الأنبياء</h2>
+        <p>عبرة في كل قصة – بطاقات سريعة القراءة</p>
+      </div>
+      
+      <div class="stories-grid" id="stories-grid">
+        <!-- يتم حقن القصص هنا بواسطة JS -->
+      </div>
     </section>
 
   </main><!-- end .main -->
@@ -608,6 +814,19 @@
     </div>
   </div>
 
+  <!-- ══════ INSTALL BANNER ══════ -->
+  <div id="install-banner" class="install-banner hidden">
+    <div class="install-banner-inner">
+      <div class="install-banner-icon">☪</div>
+      <div class="install-banner-text">
+        <div class="install-banner-title">ثبّت أذكاري على جوالك</div>
+        <div class="install-banner-sub">للحصول على إشعارات حقيقية خارج التطبيق</div>
+      </div>
+      <button class="install-banner-btn" id="btn-pwa-install" onclick="triggerPwaInstall()">تثبيت</button>
+      <button class="install-banner-x" onclick="dismissInstallBanner()">✕</button>
+    </div>
+  </div>
+
   <!-- ══════ REMINDER OVERLAY ══════ -->
   <div id="reminder-overlay" class="overlay hidden">
     <div class="modal-sheet center-modal">
@@ -615,22 +834,68 @@
       <div class="modal-head">
         <span class="modal-icon">🔔</span>
         <h2>الإشعارات والتذكيرات</h2>
-        <p>تعمل بعد إضافة الموقع كتطبيق على الجوال</p>
+        <p id="notif-status-msg">تعمل بعد إضافة الموقع كتطبيق على الجوال</p>
       </div>
-      <div class="install-guide">
-        <div class="install-row">📱 <span>iPhone: Safari → مشاركة → أضف إلى الشاشة الرئيسية</span></div>
-        <div class="install-row">🤖 <span>Android: Chrome → القائمة → تثبيت التطبيق</span></div>
+
+      <!-- دليل التثبيت المرئي -->
+      <div class="install-guide-visual">
+        <div class="install-step" id="ios-guide">
+          <div class="install-step-icon">📱</div>
+          <div class="install-step-text">
+            <strong>iPhone / iPad (Safari)</strong><br>
+            اضغط على زر المشاركة &#x2197; ثم اختر<br>
+            <em>"Add to Home Screen" / أضف إلى الشاشة الرئيسية</em>
+          </div>
+        </div>
+        <div class="install-step" id="android-guide">
+          <div class="install-step-icon">🤖</div>
+          <div class="install-step-text">
+            <strong>Android (Chrome)</strong><br>
+            اضغط القائمة ⋮ ثم اختر<br>
+            <em>"Add to Home Screen" / تثبيت التطبيق</em>
+          </div>
+        </div>
       </div>
+
+      <!-- إشعارات الأوراد -->
+      <div class="reminder-section-title">⏰ مواعيد التذكير اليومي</div>
       <div class="reminder-form">
-        <div class="rem-row"><span>☀️ أذكار الصباح:</span><input type="time" id="rt-morning" value="07:00"/></div>
+        <div class="rem-row"><span>🌅 أذكار الصباح:</span><input type="time" id="rt-morning" value="07:00"/></div>
         <div class="rem-row"><span>🌆 أذكار المساء:</span><input type="time" id="rt-evening" value="17:00"/></div>
-        <div class="rem-row"><span>📖 الختمة والزيارة:</span><input type="time" id="rt-ziyarat" value="20:00"/></div>
+        <div class="rem-row"><span>🏴 الزيارة والختمة:</span><input type="time" id="rt-ziyarat" value="20:00"/></div>
         <div class="rem-row"><span>🌙 أذكار النوم:</span><input type="time" id="rt-sleep" value="22:30"/></div>
       </div>
-      <div class="notif-actions">
-        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveReminders()">🔔 تفعيل وحفظ الإشعارات</button>
-        <button class="btn btn-ghost"   style="width:100%;justify-content:center" onclick="testNotif()">🧪 تجربة إشعار الآن</button>
+
+      <!-- تنبيه الأذان -->
+      <div class="reminder-section-title">🕌 تنبيه قبل الأذان بـ 5 دقائق</div>
+      <div class="athan-alert-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="chk-athan-alert"/>
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span>تفعيل تنبيه الأذان</span>
+        </label>
       </div>
+
+      <!-- ورد مخصص -->
+      <div class="reminder-section-title">📿 وردك اليومي المخصص</div>
+      <div class="wird-custom-form">
+        <textarea id="wird-custom-text" placeholder="اكتب ورد يذكّرك به التطبيق يومياً..."
+          rows="2" maxlength="200"></textarea>
+        <div class="rem-row"><span>⏰ وقت التذكير:</span><input type="time" id="wird-custom-time" value="08:00"/></div>
+      </div>
+
+      <!-- أزرار -->
+      <div class="notif-actions">
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveReminders()">
+          🔔 تفعيل وحفظ الإشعارات
+        </button>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="testNotif()">
+          🧪 جرّب إشعار الآن
+        </button>
+      </div>
+
+      <!-- حالة الإشعارات -->
+      <div id="notif-perm-status" class="notif-perm-status"></div>
     </div>
   </div>
 
@@ -682,6 +947,62 @@
     <button class="tasbih-reset-btn" onclick="resetTasbih()">↺ إعادة</button>
   </div>
 
+  <!-- ══════ THEME PICKER OVERLAY ══════ -->
+  <div id="theme-overlay" class="overlay hidden">
+    <div class="modal-sheet center-modal">
+      <button class="modal-close-btn" onclick="closeThemePicker()">✕</button>
+      <div class="modal-head">
+        <span class="modal-icon">🎨</span>
+        <h2>اختر ثيم التطبيق</h2>
+        <p>اختر اللون الذي يريح عينيك</p>
+      </div>
+      <div class="theme-grid">
+        <button class="theme-btn" style="--t-color:#0d6e4f;--t-bg:#f0fdf9" onclick="setTheme('default')">الأخضر الأصلي</button>
+        <button class="theme-btn" style="--t-color:#b45309;--t-bg:#fffbeb" onclick="setTheme('gold')">الذهبي الملكي</button>
+        <button class="theme-btn" style="--t-color:#1e3a8a;--t-bg:#eff6ff" onclick="setTheme('blue')">الأزرق الهادئ</button>
+        <button class="theme-btn" style="--t-color:#be185d;--t-bg:#fdf2f8" onclick="setTheme('rose')">الوردي المريح</button>
+        <button class="theme-btn" style="--t-color:#374151;--t-bg:#f3f4f6" onclick="setTheme('gray')">الرمادي الكلاسيكي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ SHARE PROGRESS CARD OVERLAY ══════ -->
+  <div id="share-card-overlay" class="overlay hidden">
+    <div class="modal-sheet center-modal" style="background:transparent;box-shadow:none;">
+      <button class="modal-close-btn" style="background:rgba(0,0,0,.5);color:#fff" onclick="closeShareCard()">✕</button>
+      
+      <!-- The Card to be captured -->
+      <div class="share-card-canvas" id="share-card-canvas">
+        <div class="share-card-header">
+          <span class="sc-logo">☪</span>
+          <span class="sc-app-name">أذكاري</span>
+        </div>
+        <div class="share-card-title">حصادي اليومي 🌿</div>
+        <div class="share-card-date" id="sc-date"></div>
+        <div class="share-card-stats">
+          <div class="sc-stat">
+            <div class="sc-stat-val" id="sc-points">0</div>
+            <div class="sc-stat-lbl">نقطة</div>
+          </div>
+          <div class="sc-stat">
+            <div class="sc-stat-val" id="sc-streak">0</div>
+            <div class="sc-stat-lbl">يوم متتالي</div>
+          </div>
+          <div class="sc-stat">
+            <div class="sc-stat-val" id="sc-done">0%</div>
+            <div class="sc-stat-lbl">مكتمل</div>
+          </div>
+        </div>
+        <div class="share-card-footer">حمّل تطبيق "أذكاري" وشاركنا الأجر ✨</div>
+      </div>
+      
+      <div class="share-card-actions">
+        <button class="btn btn-primary" onclick="downloadShareCard()">💾 حفظ الصورة</button>
+        <button class="btn-whatsapp" onclick="whatsappShareCard()">🤍 شاركها</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Font Controls -->
   <div class="font-controls">
     <button class="font-ctrl" onclick="chFont(1)"  title="تكبير">A+</button>
@@ -696,6 +1017,7 @@
 
 </div><!-- #app -->
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

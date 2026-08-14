@@ -482,11 +482,14 @@ function renderDuaaList() {
     const done = !!S.done['duaa-' + d.id];
     const el = document.createElement('div');
     el.className = 'duaa-card';
+    const textEsc = d.text.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    const titleEsc = d.title.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
     el.innerHTML = `<div class="duaa-category"><span>${d.icon}</span> ${d.cat}</div>
       <div class="duaa-title">${d.title}</div>
       <div class="duaa-text">${d.text.replace(/\n/g, '<br>')}</div>
       <div class="card-actions">
         <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
+        <button class="btn-whatsapp" onclick="shareWhatsApp('${textEsc}','${titleEsc}')">🤍 واتساب</button>
         <button class="btn btn-primary ${done ? 'done' : ''}" onclick="markRead(this, 'duaa-${d.id}', '${getCkKey(d.id)}')">✅ تمت القراءة</button>
       </div>`;
     c.appendChild(el);
@@ -501,11 +504,14 @@ function renderGreatDuaaList() {
     const done = !!S.done['great-'+d.id];
     const el = document.createElement('div');
     el.className = 'duaa-card';
+    const textEsc = d.text.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    const titleEsc = d.title.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
     el.innerHTML = `<div class="duaa-category"><span>${d.icon}</span> ${d.badge}</div>
       <div class="duaa-title">${d.title}</div>
       <div class="duaa-text">${d.text.replace(/\n/g,'<br>')}</div>
       <div class="card-actions">
         <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
+        <button class="btn-whatsapp" onclick="shareWhatsApp('${textEsc}','${titleEsc}')">🤍 واتساب</button>
         <button class="btn btn-primary ${done?'done':''}" onclick="markRead(this,'great-${d.id}','')">✅ تمت القراءة</button>
       </div>`;
     c.appendChild(el);
@@ -580,6 +586,24 @@ function renderKhatmah() {
       grid.appendChild(btn);
     });
   }
+
+  // إحصائيات الختم التراكمية
+  const khatmahStats = document.getElementById('khatmah-stats-row');
+  if (khatmahStats) {
+    const total = S.khatmah_total || 0;
+    const lastDate = S.khatmah_last_date || '';
+    khatmahStats.innerHTML = total > 0 ? `
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:.8rem">
+        <div style="text-align:center;background:var(--bg2);padding:.6rem 1.2rem;border-radius:var(--r-sm)">
+          <div style="font-size:1.6rem;font-weight:900;color:var(--g3)">${total}</div>
+          <div style="font-size:.75rem;color:var(--muted)">ختمة مكتملة 📖</div>
+        </div>
+        <div style="text-align:center;background:var(--bg2);padding:.6rem 1.2rem;border-radius:var(--r-sm)">
+          <div style="font-size:.9rem;font-weight:700;color:var(--gold)">${lastDate}</div>
+          <div style="font-size:.75rem;color:var(--muted)">آخر ختمة</div>
+        </div>
+      </div>` : '';
+  }
 }
 
 function openKhatmahReader() {
@@ -594,9 +618,22 @@ function doneKhatmah() {
   S.khatDone[d] = true;
   S.points = (S.points||0) + 100;
   S.checklist['ck-khatmah'] = true;
+
+  // إحصائيات الختمة التراكمية
+  if (d === 30) {
+    const prevTotal = S.khatmah_total || 0;
+    S.khatmah_total = prevTotal + 1;
+    S.khatmah_last_date = new Date().toLocaleDateString('ar-SA');
+    saveS();
+    setTimeout(() => {
+      toast(`🎉 مبارك! اكتملت الختمة #${S.khatmah_total} – جزاك الله خير الجزاء!`);
+      sendNotif('📖 مبارك! اكتملت الختمة', `هذه خِتمتك رقم ${S.khatmah_total} – جزاك الله خيراً!`, 'khatmah-done');
+    }, 500);
+  }
+
   if (d < 30) S.khatDay = d + 1;
   saveS(); renderKhatmah(); renderChecklist(); updateStreak();
-  toast('تقبل الله! 🎉 جزاك الله خيراً (+100 نقطة)');
+  if (d < 30) toast('تقبل الله! 🎉 جزاك الله خيراً (+100 نقطة)');
 }
 
 function resetKhatmah() {
@@ -1126,16 +1163,62 @@ function playAthan() {
   }
 }
 
-// REMINDERS & NOTIFICATIONS
-function openReminder() {
-  if ('Notification' in window && Notification.permission !== 'granted') {
-    Notification.requestPermission();
+// REMINDERS & NOTIFICATIONS – REAL BACKGROUND NOTIFICATIONS
+let deferredInstallPrompt = null;
+
+// Catch the PWA install prompt early
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const banner = document.getElementById('install-banner');
+  if (banner && !localStorage.getItem('adhkar_install_dismissed')) {
+    banner.classList.remove('hidden');
   }
-  const rem = S.reminders || {morning:'07:00', evening:'17:00', ziyarat:'20:00', sleep:'22:30'};
-  const m = document.getElementById('rt-morning'); if (m) m.value = rem.morning;
-  const e = document.getElementById('rt-evening'); if (e) e.value = rem.evening;
-  const z = document.getElementById('rt-ziyarat'); if (z) z.value = rem.ziyarat;
-  const s = document.getElementById('rt-sleep');   if (s) s.value = rem.sleep;
+});
+
+function triggerPwaInstall() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(result => {
+      if (result.outcome === 'accepted') {
+        dismissInstallBanner();
+        toast('✅ تم تثبيت أذكاري على شاشتك الرئيسية!');
+      }
+      deferredInstallPrompt = null;
+    });
+  } else {
+    // iOS – no prompt API, show instructions
+    openReminder();
+  }
+}
+
+function dismissInstallBanner() {
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.classList.add('hidden');
+  localStorage.setItem('adhkar_install_dismissed', '1');
+}
+
+function openReminder() {
+  // Request permission immediately
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(updateNotifStatus);
+  }
+  // Load saved values
+  const rem = S.reminders || { morning:'07:00', evening:'17:00', ziyarat:'20:00', sleep:'22:30' };
+  const m = document.getElementById('rt-morning');   if (m) m.value = rem.morning;
+  const e = document.getElementById('rt-evening');   if (e) e.value = rem.evening;
+  const z = document.getElementById('rt-ziyarat');   if (z) z.value = rem.ziyarat;
+  const s = document.getElementById('rt-sleep');     if (s) s.value = rem.sleep;
+
+  const chk = document.getElementById('chk-athan-alert');
+  if (chk) chk.checked = !!(S.athanAlert);
+
+  const wt = document.getElementById('wird-custom-text');
+  const wtime = document.getElementById('wird-custom-time');
+  if (wt) wt.value = (S.customWird && S.customWird.text) || '';
+  if (wtime) wtime.value = (S.customWird && S.customWird.time) || '08:00';
+
+  updateNotifStatus();
 
   const el = document.getElementById('reminder-overlay');
   if (el) el.classList.remove('hidden');
@@ -1146,93 +1229,184 @@ function closeReminder() {
   if (el) el.classList.add('hidden');
 }
 
+function updateNotifStatus() {
+  const el = document.getElementById('notif-perm-status');
+  const msg = document.getElementById('notif-status-msg');
+  if (!el) return;
+  if (!('Notification' in window)) {
+    el.innerHTML = '⚠️ متصفحك لا يدعم الإشعارات';
+    el.className = 'notif-perm-status notif-warn';
+    return;
+  }
+  const p = Notification.permission;
+  if (p === 'granted') {
+    el.innerHTML = '✅ الإشعارات مفعّلة – ستصلك حتى لو أغلقت التطبيق (عند التثبيت)';
+    el.className = 'notif-perm-status notif-ok';
+    if (msg) msg.textContent = 'الإشعارات مفعّلة بنجاح 🔔';
+  } else if (p === 'denied') {
+    el.innerHTML = '❌ الإشعارات محظورة – يرجى السماح من إعدادات المتصفح';
+    el.className = 'notif-perm-status notif-err';
+    if (msg) msg.textContent = 'يرجى السماح بالإشعارات من الإعدادات';
+  } else {
+    el.innerHTML = '⏳ لم يُسمح بالإشعارات بعد – اضغط "تفعيل" أدناه';
+    el.className = 'notif-perm-status notif-warn';
+  }
+}
+
 async function saveReminders() {
   const m = document.getElementById('rt-morning');
   const e = document.getElementById('rt-evening');
   const z = document.getElementById('rt-ziyarat');
   const s = document.getElementById('rt-sleep');
+  const chk = document.getElementById('chk-athan-alert');
+  const wt = document.getElementById('wird-custom-text');
+  const wtime = document.getElementById('wird-custom-time');
+
   S.reminders = {
     morning: m ? m.value : '07:00',
     evening: e ? e.value : '17:00',
     ziyarat: z ? z.value : '20:00',
-    sleep:   s ? s.value : '22:30'
+    sleep:   s ? s.value : '22:30',
+  };
+  S.athanAlert = chk ? chk.checked : false;
+  S.customWird = {
+    text: wt ? wt.value.trim() : '',
+    time: wtime ? wtime.value : '08:00',
   };
   saveS();
-  closeReminder();
+
+  // طلب الإذن
   if ('Notification' in window && Notification.permission !== 'granted') {
     try { await Notification.requestPermission(); } catch(err) {}
   }
-  toast('🔔 تم حفظ مواعيد الإشعارات وتفعيل التنبيهات بنجاح');
+
+  // تفعيل Periodic Background Sync (Android Chrome)
+  if ('serviceWorker' in navigator && 'PeriodicSyncManager' in window) {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const tags = await reg.periodicSync.getTags();
+      if (!tags.includes('adhkar-check')) {
+        await reg.periodicSync.register('adhkar-check', { minInterval: 60 * 1000 }); // كل دقيقة كحد أدنى
+      }
+    } catch (e) {
+      // Periodic Sync غير مدعوم – الـ SW يتحقق عند فتح التطبيق
+    }
+  }
+
+  // إرسال الجدول للـ Service Worker
+  await pushScheduleToSW();
+
+  closeReminder();
+  updateNotifStatus();
+  toast('🔔 تم حفظ وتفعيل الإشعارات بنجاح!');
+}
+
+async function pushScheduleToSW() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    if (!reg.active) return;
+    const channel = new MessageChannel();
+    reg.active.postMessage({
+      type: 'SCHEDULE_NOTIFS',
+      schedule: {
+        morning:    S.reminders && S.reminders.morning,
+        evening:    S.reminders && S.reminders.evening,
+        ziyarat:    S.reminders && S.reminders.ziyarat,
+        sleep:      S.reminders && S.reminders.sleep,
+        athanAlert: S.athanAlert,
+        prayers:    prayerTimes,
+        wird: S.customWird || {},
+      }
+    }, [channel.port2]);
+  } catch(e) {}
 }
 
 async function testNotif() {
   if (!('Notification' in window)) {
-    toast('متصفحك لا يدعم الإشعارات التلقائية');
+    toast('متصفحك لا يدعم الإشعارات');
     return;
   }
-  if (Notification.permission === 'granted') {
-    await sendNotif('أذكاري 🌿', 'هذا إشعار تجريبي من موقع أذكاري! تقبل الله طاعاتكم ✨');
-    toast('تم إرسال إشعار تجريبي 🔔');
+  let perm = Notification.permission;
+  if (perm === 'default') {
+    try { perm = await Notification.requestPermission(); } catch(e) {}
+  }
+  if (perm === 'granted') {
+    await sendNotif('أذكاري 🌿', 'هذا إشعار تجريبي! الإشعارات تعمل بنجاح ✨', 'test');
+    toast('✅ تم إرسال الإشعار التجريبي');
+    updateNotifStatus();
   } else {
-    try {
-      const perm = await Notification.requestPermission();
-      if (perm === 'granted') {
-        await sendNotif('أذكاري 🌿', 'تم تفعيل الإشعارات بنجاح في تطبيق أذكاري! ✨');
-        toast('تم تفعيل وإرسال إشعار تجريبي 🔔');
-      } else {
-        toast('يرجى السماح بالإشعارات في إعدادات المتصفح/الجهاز');
-      }
-    } catch (e) {
-      toast('يرجى تفعيل الإشعارات من إعدادات النظام');
-    }
+    toast('❌ يرجى السماح بالإشعارات من إعدادات الجهاز');
   }
 }
 
 let lastNotifMin = '';
 function checkReminders() {
+  // يشتغل لما يكون التطبيق مفتوح (backup للـ SW)
   const now = new Date();
   const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   if (timeStr === lastNotifMin) return;
 
   const rem = S.reminders || {};
-  if (timeStr === rem.morning) {
-    lastNotifMin = timeStr;
-    sendNotif('أذكار الصباح 🌅', 'حان وقت أذكار الصباح، ابدأ يومك بذكر الله!');
-  } else if (timeStr === rem.evening) {
-    lastNotifMin = timeStr;
-    sendNotif('أذكار المساء 🌇', 'حان وقت أذكار المساء، حصّن نفسك بذكر الله!');
-  } else if (timeStr === rem.ziyarat) {
-    lastNotifMin = timeStr;
-    sendNotif('زيارة عاشوراء 🏴', 'حان وقت زيارة عاشوراء والأدعية المباركة.');
-  } else if (timeStr === rem.sleep) {
-    lastNotifMin = timeStr;
-    sendNotif('أذكار النوم 🌙', 'حان وقت أذكار النوم وآية الكرسي، نوم هنيئاً معطر بذكر الله.');
+  const CHECKS = [
+    { key: 'morning', time: rem.morning, title:'أذكار الصباح 🌅', body:'حان وقت أذكار الصباح، ابدأ يومك بذكر الله!' },
+    { key: 'evening', time: rem.evening, title:'أذكار المساء 🌇', body:'حان وقت أذكار المساء، حصّن نفسك بذكر الله!' },
+    { key: 'ziyarat', time: rem.ziyarat, title:'زيارة عاشوراء 🏴', body:'حان وقت زيارة عاشوراء والأدعية المباركة.' },
+    { key: 'sleep',   time: rem.sleep,   title:'أذكار النوم 🌙', body:'حان وقت أذكار النوم وآية الكرسي.' },
+  ];
+
+  // تنبيه الأذان – 5 دقائق قبل
+  if (S.athanAlert && prayerTimes) {
+    const prayers = ['fajr','dhuhr','asr','maghrib','isha'];
+    const names = {fajr:'الفجر',dhuhr:'الظهر',asr:'العصر',maghrib:'المغرب',isha:'العشاء'};
+    prayers.forEach(p => {
+      if (prayerTimes[p]) {
+        const pt = prayerTimes[p];
+        const parts = pt.split(':');
+        let h = parseInt(parts[0],10), mn = parseInt(parts[1],10) - 5;
+        if (mn < 0) { mn += 60; h -= 1; }
+        if (h < 0) h += 24;
+        const alertTime = `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+        CHECKS.push({ key: 'athan_'+p, time: alertTime, title:`تنبيه ${names[p]} 🕌`, body:`صلاة ${names[p]} بعد 5 دقائق، استعد للصلاة 🤲` });
+      }
+    });
+  }
+
+  // الورد المخصص
+  if (S.customWird && S.customWird.text && S.customWird.time) {
+    CHECKS.push({ key:'custom_wird', time: S.customWird.time, title:'📿 وردك اليومي', body: S.customWird.text });
+  }
+
+  for (const c of CHECKS) {
+    if (c.time && timeStr === c.time) {
+      lastNotifMin = timeStr;
+      sendNotif(c.title, c.body, c.key);
+      break;
+    }
   }
 }
 
-async function sendNotif(title, body) {
-  toast(`🔔 ${title}: ${body}`);
+async function sendNotif(title, body, tag) {
+  toast(`🔔 ${title}`);
   if ('Notification' in window && Notification.permission === 'granted') {
     if ('serviceWorker' in navigator) {
       try {
         const reg = await navigator.serviceWorker.ready;
         if (reg && reg.showNotification) {
-          reg.showNotification(title, {
-            body: body,
-            icon: 'manifest.json',
-            badge: 'manifest.json',
-            dir: 'rtl',
-            lang: 'ar',
+          await reg.showNotification(title, {
+            body,
+            dir: 'rtl', lang: 'ar',
             vibrate: [200, 100, 200],
-            tag: 'adhkar-reminder'
+            tag: tag || 'adhkar',
+            icon: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d6e4f'/><text y='72' x='50' text-anchor='middle' font-size='60' fill='%23fbbf24'>&#x262a;</text></svg>`,
+            badge: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d6e4f'/><text y='72' x='50' text-anchor='middle' font-size='60' fill='%23fbbf24'>&#x262a;</text></svg>`,
+            data: { url: './' }
           });
           return;
         }
       } catch (e) {}
     }
-    try {
-      new Notification(title, { body: body, icon: 'manifest.json', dir: 'rtl', lang: 'ar' });
-    } catch(e) {}
+    try { new Notification(title, { body, icon: '', dir: 'rtl', lang: 'ar' }); } catch(e) {}
   }
 }
 
@@ -1579,7 +1753,20 @@ function toast(msg) {
 // INIT
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
-    try { navigator.serviceWorker.register('./sw.js'); } catch(e) {}
+    try {
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      // بعد تسجيل SW، أرسل الجدول له
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'activated') pushScheduleToSW();
+          });
+        }
+      });
+      // أرسل الجدول لو SW نشط مسبقاً
+      if (reg.active) pushScheduleToSW();
+    } catch(e) {}
   });
 }
 
@@ -1590,32 +1777,455 @@ document.addEventListener('DOMContentLoaded', () => {
   loadPrayerTimes();
   setInterval(checkReminders, 10000);
 
-  // Auto show main app if previously opened or on load
+  // Auto show main app if previously opened
   const h = document.getElementById('hero');
   const a = document.getElementById('app');
   if (localStorage.getItem('adhkar_v5')) {
     if (h) h.style.display = 'none';
-    if (a) {
-      a.classList.remove('hidden');
-      a.style.display = 'block';
-    }
+    if (a) { a.classList.remove('hidden'); a.style.display = 'block'; }
   }
+
+  // Push schedule to SW on load
+  setTimeout(pushScheduleToSW, 2000);
 
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     ['study-overlay','reminder-overlay','reader-overlay','tasbih-overlay'].forEach(id => {
-      const el=document.getElementById(id);
+      const el = document.getElementById(id);
       if (el && !el.classList.contains('hidden')) el.classList.add('hidden');
     });
-    studyOpen=false;
-    const sb=document.getElementById('btn-study'); if(sb) sb.classList.remove('active');
+    studyOpen = false;
+    const sb = document.getElementById('btn-study'); if(sb) sb.classList.remove('active');
   });
 
   ['study-overlay','reminder-overlay','reader-overlay'].forEach(id => {
-    const el=document.getElementById(id);
-    if (el) el.addEventListener('click', ev => { if(ev.target===el) el.classList.add('hidden'); });
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', ev => { if(ev.target === el) el.classList.add('hidden'); });
+  });
+
+  // إغلاق نتائج البحث بالضغط خارجها
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('global-search-wrap') || document.querySelector('.global-search-wrap');
+    const res = document.getElementById('global-search-results');
+    if (res && !res.classList.contains('hidden')) {
+      if (!e.target.closest('.global-search-wrap')) {
+        res.classList.add('hidden');
+      }
+    }
   });
 });
+
+// GLOBAL SEARCH
+function globalSearch(query) {
+  const res = document.getElementById('global-search-results');
+  if (!res) return;
+  const q = query.trim();
+  if (!q || q.length < 2) { res.classList.add('hidden'); res.innerHTML = ''; return; }
+
+  const norm = txt => txt ? txt.replace(/[\u064B-\u0652]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase() : '';
+  const qn = norm(q);
+
+  let results = [];
+
+  // بحث في الأدعية
+  DUAAS.forEach(d => {
+    if (norm(d.title).includes(qn) || norm(d.text).includes(qn) || norm(d.cat).includes(qn)) {
+      results.push({ type: 'دعاء', icon: d.icon, title: d.title, cat: d.cat, text: d.text.slice(0,100), action: () => go('duaa') });
+    }
+  });
+
+  // بحث في الأدعية الكبيرة
+  GREAT_DUAAS.forEach(d => {
+    if (norm(d.title).includes(qn) || norm(d.text).includes(qn)) {
+      results.push({ type: 'دعاء', icon: d.icon, title: d.title, cat: d.badge, text: d.text.slice(0,100), action: () => go('duaa') });
+    }
+  });
+
+  // بحث في السور
+  SURAHS.forEach(s => {
+    if (norm(s.n).includes(qn)) {
+      results.push({ type: 'سورة', icon: '📖', title: s.n, cat: `الجزء ${s.j}`, text: `${s.v} آية – ${s.t}`, action: () => { go('quran'); setTimeout(() => openReader(s.id - 1), 300); } });
+    }
+  });
+
+  // بحث في السور المحفوظة
+  SUWAR_LIST && SUWAR_LIST.forEach(s => {
+    if (norm(s.n).includes(qn)) {
+      results.push({ type: 'سورة', icon: '✨', title: s.n, cat: 'السور الشريفة', text: s.info || '', action: () => go('suwar') });
+    }
+  });
+
+  results = results.slice(0, 12);
+
+  if (!results.length) {
+    res.innerHTML = `<div class="search-no-result">لا نتائج لـ "${escapeHtml(q)}"</div>`;
+    res.classList.remove('hidden');
+    return;
+  }
+
+  res.innerHTML = results.map((r, i) => `
+    <div class="search-result-item" onclick="searchResultClick(${i})">
+      <span class="search-result-icon">${r.icon}</span>
+      <div class="search-result-body">
+        <div class="search-result-title">${escapeHtml(r.title)}</div>
+        <div class="search-result-meta">${escapeHtml(r.cat)} • ${escapeHtml(r.type)}</div>
+        <div class="search-result-text">${escapeHtml(r.text)}...</div>
+      </div>
+    </div>
+  `).join('');
+  res.classList.remove('hidden');
+
+  // حفظ actions مؤقتاً
+  window._searchResults = results;
+}
+
+function searchResultClick(idx) {
+  const r = window._searchResults && window._searchResults[idx];
+  if (r && r.action) {
+    r.action();
+    const res = document.getElementById('global-search-results');
+    const inp = document.getElementById('global-search-input');
+    if (res) res.classList.add('hidden');
+    if (inp) inp.value = '';
+  }
+}
+
+// مشاركة دعاء عبر واتساب
+function shareWhatsApp(text, title) {
+  const msg = encodeURIComponent(`${title}\n\n${text}\n\n– من تطبيق أذكاري`);
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
+}
+
+// إحصائيات الختمة التراكمية
+function getKhatmahStats() {
+  const total = S.khatmah_total || 0;
+  const lastDate = S.khatmah_last_date || null;
+  return { total, lastDate };
+}
+
+// ══════ THEMES ══════
+function openThemePicker() { document.getElementById('theme-overlay').classList.remove('hidden'); }
+function closeThemePicker() { document.getElementById('theme-overlay').classList.add('hidden'); }
+function setTheme(theme) {
+  S.theme = theme; saveS(); applyTheme();
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  event && event.currentTarget && event.currentTarget.classList.add('active');
+}
+function applyTheme() {
+  const t = S.theme || 'default';
+  const root = document.documentElement;
+  if(t==='gold') { root.style.setProperty('--g1','#78350f'); root.style.setProperty('--g2','#b45309'); root.style.setProperty('--g3','#d97706'); root.style.setProperty('--gold','#fbbf24'); }
+  else if(t==='blue') { root.style.setProperty('--g1','#1e3a8a'); root.style.setProperty('--g2','#2563eb'); root.style.setProperty('--g3','#3b82f6'); root.style.setProperty('--gold','#60a5fa'); }
+  else if(t==='rose') { root.style.setProperty('--g1','#831843'); root.style.setProperty('--g2','#be185d'); root.style.setProperty('--g3','#ec4899'); root.style.setProperty('--gold','#f472b6'); }
+  else if(t==='gray') { root.style.setProperty('--g1','#1f2937'); root.style.setProperty('--g2','#374151'); root.style.setProperty('--g3','#4b5563'); root.style.setProperty('--gold','#9ca3af'); }
+  else { root.style.setProperty('--g1','#064e3b'); root.style.setProperty('--g2','#059669'); root.style.setProperty('--g3','#10b981'); root.style.setProperty('--gold','#fbbf24'); }
+}
+// ══════ HIJRI CALENDAR ══════
+function updateHijriDate() {
+  try {
+    const today = new Date();
+    const formatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {day: 'numeric', month: 'long', year: 'numeric'});
+    const hDate = formatter.format(today);
+    
+    // Navbar
+    const navHijri = document.getElementById('nav-hijri');
+    if(navHijri) navHijri.textContent = hDate;
+
+    // Qibla Tab Card
+    const cardHijri = document.getElementById('hijri-date-big');
+    if(cardHijri) cardHijri.textContent = hDate;
+    
+    const gregDate = new Intl.DateTimeFormat('ar-SA', {day: 'numeric', month: 'long', year: 'numeric'}).format(today);
+    const cardGreg = document.getElementById('hijri-greg');
+    if(cardGreg) cardGreg.textContent = gregDate;
+
+    // Check Occasions (rough approximation based on text match)
+    const occ = document.getElementById('hijri-occasion');
+    if(occ) {
+      if(hDate.includes('رمضان')) occ.textContent = '🌙 شهر رمضان المبارك';
+      else if(hDate.includes('شوال') && hDate.includes('1 ')) occ.textContent = '🎉 عيد الفطر المبارك';
+      else if(hDate.includes('ذو الحجة') && hDate.includes('10 ')) occ.textContent = '🐑 عيد الأضحى المبارك';
+      else if(hDate.includes('محرم') && hDate.includes('10 ')) occ.textContent = '🏴 يوم عاشوراء';
+      else if(hDate.includes('ربيع الأول') && hDate.includes('12 ')) occ.textContent = '✨ المولد النبوي الشريف';
+      else occ.textContent = '';
+    }
+  } catch(e) { console.error('Hijri err:', e); }
+}
+
+// ══════ FRIDAY REMINDER ══════
+function checkFriday() {
+  const isFriday = new Date().getDay() === 5;
+  const fCard = document.getElementById('friday-card');
+  const fBody = document.getElementById('friday-body');
+  if(fCard && fBody) {
+    if(isFriday) {
+      fCard.style.display = 'flex';
+      fCard.style.borderColor = 'var(--gold)';
+      fBody.innerHTML = 'اليوم الجمعة! لا تنسَ قراءة سورة الكهف، والإكثار من الصلاة على النبي ﷺ، والدعاء في ساعة الاستجابة.';
+    } else {
+      fCard.style.display = 'none';
+    }
+  }
+}
+function fridayShareWhatsApp() { shareWhatsApp('لا تنسَ قراءة سورة الكهف اليوم، والإكثار من الصلاة على النبي ﷺ 🤍', 'تذكير يوم الجمعة المبارك'); }
+
+// ══════ SHARE PROGRESS CARD ══════
+function openShareCard() {
+  document.getElementById('share-card-overlay').classList.remove('hidden');
+  document.getElementById('sc-date').textContent = new Date().toLocaleDateString('ar-SA');
+  
+  // Calculate basic points
+  let pts = 0;
+  if(S.khatmah_total) pts += S.khatmah_total * 1000;
+  let checks = 0; let totalChecks = 0;
+  Object.keys(S.done||{}).forEach(k=>{ totalChecks++; if(S.done[k]) checks++; });
+  pts += checks * 10;
+  
+  document.getElementById('sc-points').textContent = pts;
+  document.getElementById('sc-streak').textContent = S.streak || 0;
+  document.getElementById('sc-done').textContent = totalChecks > 0 ? Math.round((checks/totalChecks)*100)+'%' : '0%';
+}
+function closeShareCard() { document.getElementById('share-card-overlay').classList.add('hidden'); }
+function downloadShareCard() {
+  if(!window.html2canvas) return toast('جاري تحميل مكتبة الصور، حاول بعد ثوانٍ');
+  const node = document.getElementById('share-card-canvas');
+  node.style.transform = 'scale(1)'; // ensure normal scale
+  html2canvas(node, {backgroundColor: '#ffffff', scale: 2}).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'my-progress.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('✅ تم حفظ الصورة بنجاح');
+  });
+}
+function whatsappShareCard() {
+  const pts = document.getElementById('sc-points').textContent;
+  const str = document.getElementById('sc-streak').textContent;
+  const text = `أكملت أذكاري اليوم وحصلت على ${pts} نقطة! 🌿🔥 ستريكي الآن: ${str} يوم. حمّل تطبيق أذكاري وشاركني الأجر.`;
+  shareWhatsApp(text, 'إنجازي اليومي');
+}
+
+// ══════ RAMADAN TRACKER ══════
+function initRamadan() {
+  // Simple countdown to a fixed date (approximate for 2025: Feb 28/Mar 1)
+  const rmDate = new Date('2025-02-28T00:00:00');
+  const now = new Date();
+  const diffDays = Math.ceil((rmDate - now) / (1000 * 60 * 60 * 24));
+  
+  const rmDays = document.getElementById('ramadan-days');
+  const rmLbl = document.getElementById('ramadan-lbl');
+  
+  if(rmDays) {
+    if(diffDays > 0) {
+      rmDays.textContent = diffDays;
+      rmLbl.textContent = 'يوم حتى رمضان المبارك';
+    } else if(diffDays > -30) {
+      rmDays.textContent = Math.abs(diffDays) + 1;
+      rmLbl.textContent = 'رمضان – اليوم رقم';
+    } else {
+      rmDays.textContent = 'تقبل الله';
+      rmLbl.textContent = 'انتهى رمضان';
+    }
+  }
+
+  // Fasting Grid
+  S.ramadanFasts = S.ramadanFasts || {};
+  const grid = document.getElementById('ramadan-fasting-grid');
+  if(grid) {
+    grid.innerHTML = '';
+    let fastedCount = 0;
+    for(let i=1; i<=30; i++) {
+      const d = document.createElement('div');
+      d.className = 'ramadan-day' + (S.ramadanFasts[i] ? ' fasted' : '');
+      d.textContent = i;
+      d.onclick = function() {
+        S.ramadanFasts[i] = !S.ramadanFasts[i];
+        saveS(); initRamadan();
+      };
+      if(S.ramadanFasts[i]) fastedCount++;
+      grid.appendChild(d);
+    }
+    document.getElementById('rm-fasted').textContent = fastedCount;
+    document.getElementById('rm-remaining').textContent = 30 - fastedCount;
+  }
+  
+  if(document.getElementById('rm-tarawih')) document.getElementById('rm-tarawih').textContent = S.rm_tarawih || 0;
+  if(S.rm_tarawih_done) document.getElementById('btn-tarawih').classList.add('done');
+  if(S.rm_quran_done) document.getElementById('btn-rm-quran').classList.add('done');
+  if(S.rm_duaa_done) document.getElementById('btn-rm-duaa').classList.add('done');
+}
+function markTarawih() { S.rm_tarawih = (S.rm_tarawih||0)+1; S.rm_tarawih_done = true; saveS(); document.getElementById('btn-tarawih').classList.add('done'); initRamadan(); toast('✅ تم تسجيل التراويح'); }
+function markRamadanQuran() { S.rm_quran_done = true; saveS(); document.getElementById('btn-rm-quran').classList.add('done'); openKhatmahReader(); }
+function markRamadanDuaa() { S.rm_duaa_done = true; saveS(); document.getElementById('btn-rm-duaa').classList.add('done'); toast('تقبل الله صيامكم وإفطاركم 🌙'); }
+
+// ══════ QIBLA ══════
+function initQibla() {
+  const lbl = document.getElementById('qibla-location');
+  const ang = document.getElementById('qibla-angle');
+  
+  if(!navigator.geolocation) {
+    if(lbl) lbl.textContent = "الموقع الجغرافي غير مدعوم في متصفحك";
+    return;
+  }
+  
+  if(lbl) lbl.textContent = "جاري تحديد الموقع...";
+  
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    if(lbl) lbl.textContent = `📍 ${lat.toFixed(2)}, ${lng.toFixed(2)}`;
+    
+    // Kaaba coords
+    const kLat = 21.4225;
+    const kLng = 39.8262;
+    
+    // Math to get bearing
+    const lat1 = lat * Math.PI/180;
+    const lat2 = kLat * Math.PI/180;
+    const dLng = (kLng - lng) * Math.PI/180;
+    
+    const y = Math.sin(dLng) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+    let brng = Math.atan2(y, x) * 180 / Math.PI;
+    brng = (brng + 360) % 360;
+    
+    if(ang) ang.textContent = brng.toFixed(1) + ' °';
+    
+    // Start Compass listening
+    if(window.DeviceOrientationEvent) {
+      // iOS requires permission
+      if(typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+          .then(res => {
+            if(res === 'granted') window.addEventListener('deviceorientation', e => handleOrientation(e, brng), true);
+            else alert("يجب السماح بالوصول للبوصلة");
+          }).catch(console.error);
+      } else {
+        // Android / non-iOS
+        window.addEventListener('deviceorientationabsolute', e => handleOrientation(e, brng), true);
+      }
+    } else {
+      alert("البوصلة غير مدعومة على جهازك");
+    }
+  }, err => {
+    if(lbl) lbl.textContent = "❌ خطأ في تحديد الموقع: " + err.message;
+  });
+}
+function handleOrientation(e, qiblaBearing) {
+  let alpha = e.webkitCompassHeading;
+  if(typeof alpha === 'undefined') {
+    alpha = 360 - e.alpha; // Android
+  }
+  if(!alpha) return;
+  
+  const needle = document.getElementById('qibla-needle');
+  const compass = document.getElementById('qibla-compass');
+  
+  // Rotate compass rose based on device heading
+  if(compass) compass.style.transform = `rotate(${-alpha}deg)`;
+  
+  // Rotate needle to point to Qibla (relative to North)
+  // Actually, if we rotate the compass container, the needle should just point to Qibla bearing statically on the compass
+  if(needle) needle.style.transform = `rotate(${qiblaBearing}deg)`;
+}
+
+// ══════ STATS DASHBOARD ══════
+function initStats() {
+  const grid = document.getElementById('stats-quick-grid');
+  if(!grid) return;
+  
+  let checks = 0; let totalChecks = 0;
+  Object.keys(S.done||{}).forEach(k=>{ totalChecks++; if(S.done[k]) checks++; });
+  const points = (checks * 10) + ((S.khatmah_total||0) * 1000);
+  
+  grid.innerHTML = `
+    <div class="stat-qk-box"><div class="stat-qk-val">${S.streak||0}</div><div class="stat-qk-lbl">يوم متتالي</div></div>
+    <div class="stat-qk-box"><div class="stat-qk-val">${S.khatmah_total||0}</div><div class="stat-qk-lbl">ختمات</div></div>
+    <div class="stat-qk-box"><div class="stat-qk-val">${points}</div><div class="stat-qk-lbl">نقطة</div></div>
+    <div class="stat-qk-box"><div class="stat-qk-val">${totalChecks>0?Math.round((checks/totalChecks)*100):0}%</div><div class="stat-qk-lbl">إنجاز اليوم</div></div>
+  `;
+  
+  // Chart (Mockup UI)
+  const chart = document.getElementById('weekly-chart');
+  if(chart) {
+    const days = ['أحد','إثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+    let html = '';
+    for(let i=0; i<7; i++) {
+      const h = Math.floor(Math.random() * 80) + 10;
+      html += `<div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="chart-col" style="height:${h}px"><span class="chart-col-val">${h}%</span></div><div class="chart-lbl">${days[i]}</div></div>`;
+    }
+    chart.innerHTML = html;
+  }
+  
+  // Achievements
+  const ach = document.getElementById('achievements-grid');
+  if(ach) {
+    ach.innerHTML = `
+      <div class="achievement ${S.streak >= 3 ? 'unlocked' : ''}"><div class="ach-icon">🔥</div><div class="ach-title">مستمر</div><div class="ach-sub">3 أيام</div></div>
+      <div class="achievement ${S.streak >= 7 ? 'unlocked' : ''}"><div class="ach-icon">🎖️</div><div class="ach-title">مواظب</div><div class="ach-sub">أسبوع</div></div>
+      <div class="achievement ${(S.khatmah_total||0) >= 1 ? 'unlocked' : ''}"><div class="ach-icon">📖</div><div class="ach-title">ختمة</div><div class="ach-sub">أكملت ختمة</div></div>
+      <div class="achievement ${S.rm_tarawih >= 10 ? 'unlocked' : ''}"><div class="ach-icon">🌙</div><div class="ach-title">رمضان</div><div class="ach-sub">10 تراويح</div></div>
+    `;
+  }
+}
+
+// ══════ SHARED KHATMAH ══════
+function generateSharedKhatmah() {
+  let msg = "✨ *ختمة قرآنية مشتركة* ✨\nشاركونا الأجر في ختم كتاب الله:\n\n";
+  for(let i=1; i<=30; i++) {
+    msg += `الجزء ${i}: \n`;
+  }
+  msg += "\nللمشاركة، انسخ الرسالة واكتب اسمك بجانب الجزء الذي ستقرأه 🤍\n– تم الإنشاء عبر تطبيق أذكاري";
+  shareWhatsApp(msg, 'ختمة مشتركة');
+}
+
+// ══════ STORIES LIBRARY ══════
+const STORIES = [
+  { t: 'توبة كعب بن مالك', sub: 'قصة صحابي', text: 'تخلف كعب عن غزوة تبوك، فلم يختلق الأعذار وصدق رسول الله ﷺ، فقاطعه المسلمون 50 يوماً حتى ضاقت عليه الأرض بما رحبت، ثم أنزل الله توبته في القرآن: ﴿وَعَلَى الثَّلاثَةِ الَّذينَ خُلِّفوا...﴾، ليعلمنا أن الصدق منجاة.' },
+  { t: 'صبر النبي أيوب', sub: 'قصة نبي', text: 'فقد أيوب عليه السلام ماله وولده وصحته، ولبث في المرض سنين طويلة، ولم يزدد إلا صبراً وشكراً، حتى نادى ربه: ﴿أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ﴾، فكشف الله ضره وعوضه.' },
+  { t: 'شجاعة أمير المؤمنين (ع)', sub: 'قصص أهل البيت', text: 'في غزوة خيبر استعصى الحصن، فقال النبي ﷺ: "لأُعطيَنَّ الرَّايةَ غداً رجلاً يحبُّ اللهَ ورسولَه، ويحبُّه اللهُ ورسولُه، يفتحُ اللهُ على يديه". فدعا علياً (ع) وكان أرمد العين، فشفاه وأعطاه الراية، فدكّ حصون خيبر واقتلع بابها بقوة إيمانه.' },
+  { t: 'عطاء الزهراء (ع)', sub: 'قصص أهل البيت', text: 'مرض الحسنان، فنذر الإمام علي وفاطمة (عليهما السلام) صيام ثلاثة أيام. عند الإفطار في اليوم الأول جاء مسكين فأعطوه طعامهم، وفي الثاني يتيم، وفي الثالث أسير. وبقوا بلا طعام، فأنزل الله فيهم: ﴿وَيُطْعِمُونَ الطَّعَامَ عَلَىٰ حُبِّهِ مِسْكِينًا وَيَتِيمًا وَأَسِيرًا﴾.' },
+  { t: 'إسلام عمر بن الخطاب', sub: 'قصة صحابي', text: 'خرج شاهراً سيفه ليقتل النبي ﷺ، وفي طريقه قرأ آيات من سورة طه في بيت أخته، فاهتز قلبه القاسي وذهب للنبي مسلماً، فعزّ به الإسلام وتغير مجرى التاريخ.' },
+  { t: 'كرم الحسن المجتبى (ع)', sub: 'قصص أهل البيت', text: 'قاسم الإمام الحسن (ع) اللهَ مالَه ثلاث مرات، حتى كان يعطي نعلاً ويمسك نعلاً، وكان يُعرف بـ "كريم أهل البيت". وفي يوم سأله محتاج فأعطاه كل ما في خزنته، ليعلمنا أن الجود الحقيقي هو العطاء بلا حساب.' },
+  { t: 'أصحاب الكهف', sub: 'قصة قرآنية', text: 'فتية آمنوا بربهم في مجتمع مشرك، ففروا بدينهم إلى كهف مظلم، فألقى الله عليهم النوم 309 سنوات! استيقظوا ليجدوا أن قريتهم بأكملها قد آمنت.' },
+  { t: 'إباء الحسين (ع)', sub: 'قصص أهل البيت', text: 'في يوم عاشوراء، خُيّر الإمام الحسين (ع) بين البيعة لظالم أو القتل، فصرخ صرخته المدوية التي خلدها التاريخ: "ألا وإن الدعي ابن الدعي قد ركز بين اثنتين، بين السلة والذلة، وهيهات منا الذلة!"، ضارباً أعظم مثل في التضحية والكرامة.' },
+  { t: 'عفو زين العابدين (ع)', sub: 'قصص أهل البيت', text: 'كانت جارية تسكب الماء للإمام السجاد (ع)، فسقط الإبريق على وجهه فشجه. فخافت وقالت: "وَالْكَاظِمِينَ الْغَيْظَ"، قال: كظمت غيظي. قالت: "وَالْعَافِينَ عَنِ النَّاسِ"، قال: عفا الله عنكِ. قالت: "وَاللَّهُ يُحِبُّ الْمُحْسِنِينَ"، قال: اذهبي فأنتِ حرة لوجه الله.' },
+  { t: 'غار ثور', sub: 'السيرة النبوية', text: 'أثناء الهجرة، اختبأ النبي ﷺ وأبو بكر في الغار، والمشركون فوق رؤوسهم. فقال له النبي بثبات عجيب: "يا أبا بكر، ما ظنك باثنين الله ثالثهما؟ ﴿لا تَحْزَنْ إِنَّ اللَّهَ مَعَنا﴾".' },
+  { t: 'صاحب الجنتين', sub: 'قصة قرآنية', text: 'رجل أعطاه الله مزرعتين عظيمتين، فاغتر وتكبر وقال لصاحبه: "أنا أكثر منك مالاً"، ونسي شكر المنعم، فأرسل الله عليها صاعقة فدمرتها.' },
+  { t: 'تواضع الإمام الرضا (ع)', sub: 'قصص أهل البيت', text: 'دخل الإمام الرضا (ع) الحمام (المسبح العام)، فلم يعرفه رجل هناك، فطلب من الإمام أن يدلك له ظهره! فجعل الإمام يدلكه بكل تواضع، حتى دخل الناس وعرفوه فاعتذر الرجل بشدة، فطيّب الإمام خاطره واستمر في تدليكه ليعلمنا قمة التواضع.' },
+  { t: 'إسلام سلمان الفارسي', sub: 'قصة صحابي', text: 'رحلة بحث طويلة عن الحقيقة، من المجوسية في فارس، إلى النصرانية في الشام والعراق، حتى بيع كعبد في المدينة! فلما التقى بالنبي أسلم، فكافأه النبي بقوله: "سلمان منا آل البيت".' },
+  { t: 'علم الإمام الصادق (ع)', sub: 'قصص أهل البيت', text: 'كان مسجد الكوفة يعج بآلاف طلاب العلم، كلٌ يقول: "حدثني جعفر بن محمد". أسس مدرسة فكرية عظيمة تخرج منها أئمة المذاهب وعلماء الكيمياء كجابر بن حيان، فنشر نور النبوة بالعلم والفكر.' },
+  { t: 'المرأة المخزومية', sub: 'السيرة النبوية', text: 'امرأة من أشراف قريش سرقت، فحاول أسامة أن يشفع لها. فغضب النبي وقال: "لو أن فاطمة بنت محمد سرقت لقطعت يدها"، مرسخاً مبدأ العدل والمساواة.' },
+  { t: 'ماشطة ابنة فرعون', sub: 'قصة إيمان', text: 'وقعت المشط فقالت "بسم الله". سألتها البنت: أبي؟ قالت: "بل ربي ورب أبيك الله". ألقى فرعون أبناءها في النحاس المغلي، فأنطق الله رضيعها: "يا أماه اصبري فإنك على الحق".' },
+  { t: 'مؤمن آل فرعون', sub: 'قصة قرآنية', text: 'رجل يكتم إيمانه، لما أراد فرعون قتل موسى، وقف الرجل بشجاعة وقال: ﴿أَتَقْتُلُونَ رَجُلاً أَن يَقُولَ رَبِّيَ اللَّهُ﴾، فخلده القرآن كرمز للشجاعة.' },
+  { t: 'أصحاب الأخدود', sub: 'قصة قرآنية', text: 'حفر الملك الظالم خنادق وأشعل فيها النار لكل من آمن بالله، فاختار المؤمنون الموت حرقاً على الكفر، فخلدهم الله سورة البروج.' }
+];
+
+function initStories() {
+  const grid = document.getElementById('stories-grid');
+  if(!grid) return;
+  grid.innerHTML = STORIES.map((s, i) => `
+    <div class="story-card">
+      <div class="story-footer" style="margin-bottom:.8rem">
+        <span class="story-badge">${s.sub}</span>
+        <button class="btn btn-ghost" onclick="shareWhatsApp('${s.t}\\n\\n${s.text}', 'قصة وعبرة')">📤 شارك</button>
+      </div>
+      <div class="story-title">${s.t}</div>
+      <div class="story-text">${s.text}</div>
+    </div>
+  `).join('');
+}
+
+// ══════ OVERRIDE INIT ══════
+// Call init functions on startup
+setTimeout(() => {
+  applyTheme();
+  updateHijriDate();
+  checkFriday();
+  initRamadan();
+  initStats();
+  initStories();
+}, 500);
 
 // GLOBAL EXPORTS FOR HTML ONCLICK HANDLERS
 Object.assign(window, {
@@ -1626,5 +2236,12 @@ Object.assign(window, {
   resetKhatmah, filterSurahs, renderQuranIndex, renderReciterRow, randomReciter, openReader,
   renderReaderContent, changeReaderReciter, pickRandomReaderReciter, readerPrev, readerNext, closeReader,
   openTasbih, closeTasbih, setTasbih, tapTasbih, resetTasbih, toggleStudy, saveIstiNote, clearIstiNote,
-  loadIstiNote, openReminder, closeReminder, saveReminders, testNotif, sendAiMessage, sendQuickQ, generateAiReply
+  loadIstiNote, openReminder, closeReminder, saveReminders, testNotif, sendAiMessage, sendQuickQ, generateAiReply,
+  triggerPwaInstall, dismissInstallBanner, globalSearch, searchResultClick, shareWhatsApp, updateNotifStatus, pushScheduleToSW,
+  // New features exports
+  openThemePicker, closeThemePicker, setTheme, 
+  initQibla, fridayShareWhatsApp,
+  initRamadan, markTarawih, markRamadanQuran, markRamadanDuaa,
+  openShareCard, closeShareCard, downloadShareCard, whatsappShareCard,
+  generateSharedKhatmah, initStories
 });
