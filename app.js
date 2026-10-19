@@ -1728,11 +1728,13 @@ async function enablePush() {
   if (Notification.permission !== 'granted' && (await Notification.requestPermission()) !== 'granted') {
     toast('فعّل الإشعارات من إعدادات الجهاز'); return false;
   }
-  if (!CFG.PUSH_ENDPOINT || !CFG.VAPID_PUBLIC_KEY) { syncPush(); return true; }
+  let vk = CFG.VAPID_PUBLIC_KEY;
+  if (!vk && CFG.PUSH_ENDPOINT) { try { const r = await fetch(CFG.PUSH_ENDPOINT + '/key'); if (r.ok) vk = (await r.text()).trim(); } catch (e) {} }
+  if (!CFG.PUSH_ENDPOINT || !/^[\w-]{86,88}$/.test(vk || '')) { syncPush(); return true; }
   try {
     const reg = await navigator.serviceWorker.ready;
     const sub = (await reg.pushManager.getSubscription()) ||
-      await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(CFG.VAPID_PUBLIC_KEY) });
+      await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(vk) });
     await syncPush(sub);
   } catch (e) { toast('تعذّر تفعيل الإشعارات'); return false; }
   return true;
