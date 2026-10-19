@@ -3,8 +3,8 @@
    ══════════════════════════════════════════════════════ */
 'use strict';
 
-const CACHE = 'adhkar-v9';
-const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.json'];
+const CACHE = 'adhkar-v11';
+const ASSETS = ['./', './index.html', './style.css', './premium.css', './config.js', './icon-192.png', './app.js', './manifest.json'];
 
 /* ── إشعارات مجدولة (الأوقات) ── */
 const NOTIF_MESSAGES = {
@@ -57,8 +57,8 @@ self.addEventListener('fetch', e => {
 
 /* ── Push من سيرفر خارجي ── */
 self.addEventListener('push', e => {
-  const d = e.data ? e.data.json() : { title: 'أذكاري 🌿', body: 'حان وقت الورد 📿' };
-  e.waitUntil(showAdhkarNotif(d.title, d.body, d.tag || 'push'));
+  let d = null; try { d = e.data && e.data.json(); } catch (_) {}
+  e.waitUntil(d && d.title ? showAdhkarNotif(d.title, d.body, d.tag || 'push') : pushNotif());
 });
 
 /* ── Periodic Background Sync (Android Chrome) ── */
@@ -212,3 +212,20 @@ self.addEventListener('notificationclick', e => {
     })
   );
 });
+
+/* ── Push بدون حمولة: نحدد الرسالة من جدول المستخدم (آيفون يشترط إظهار إشعار دائماً) ── */
+const PUSH_MSG = { morning:['أذكار الصباح 🌅','حان وقت أذكار الصباح، ابدأ يومك بذكر الله'], evening:['أذكار المساء 🌇','حان وقت أذكار المساء، حصّن نفسك بذكر الله'],
+  ziyarat:['زيارة عاشوراء 🏴','حان وقت الزيارة والأدعية المباركة'], sleep:['أذكار النوم 🌙','آية الكرسي وأذكار النوم قبل أن تنام'] };
+const PUSH_PRAYER = { fajr:'الفجر', dhuhr:'الظهر', asr:'العصر', maghrib:'المغرب', isha:'العشاء' };
+async function pushNotif() {
+  let t = ['أذكاري 🌿', 'اذكر الله، فبذكره تطمئن القلوب'];
+  try {
+    const s = await getSchedule(), n = new Date(), m = n.getHours() * 60 + n.getMinutes();
+    const mins = h => { const [a, b] = String(h).split(':'); return +a * 60 + +b; };
+    const near = h => h && Math.abs(mins(h) - m) <= 2;
+    const k = s && Object.keys(PUSH_MSG).find(x => near(s[x]));
+    if (k) t = PUSH_MSG[k];
+    else if (s && s.prayers) { const p = Object.keys(PUSH_PRAYER).find(x => near(s.prayers[x])); if (p) t = ['🕌 حان وقت صلاة ' + PUSH_PRAYER[p], 'حيّ على الصلاة، أرح قلبك بالسجود']; }
+  } catch (_) {}
+  return showAdhkarNotif(t[0], t[1], 'push');
+}
