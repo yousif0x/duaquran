@@ -1,30 +1,85 @@
 {
-  "name": "أذكاري - رفيقك الإسلامي اليومي",
+  "name": "أذكاري – رفيقك الإسلامي اليومي",
   "short_name": "أذكاري",
-  "description": "تطبيق إسلامي للأذكار والأدعية والختمة القرآنية الشهرية والإشعارات اليومية",
+  "description": "أذكار وأدعية وختمة قرآنية وأوقات الصلاة وسبحة رقمية ومساعد ديني وإشعارات يومية",
   "id": "/",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0a1628",
-  "theme_color": "#064e3b",
+  "background_color": "#070816",
+  "theme_color": "#070816",
   "dir": "rtl",
   "lang": "ar",
-  "categories": ["religion", "education", "lifestyle"],
-    "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  "categories": [
+    "religion",
+    "lifestyle",
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
     {
       "name": "الأذكار",
-      "url": "./index.html#salah",
+      "url": "/index.html#salah",
       "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
-  ],
-  "screenshots": [],
-  "related_applications": [],
-  "prefer_related_applications": false
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "الأدعية",
+      "url": "/index.html#duaa",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "القرآن",
+      "url": "/index.html#quran",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "المساعد الذكي",
+      "url": "/index.html#ai",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }

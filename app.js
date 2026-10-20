@@ -1648,7 +1648,7 @@ const DUAS_PLUS = [
 
 // ── المفضلة ──
 let FAVS = []; try { FAVS = JSON.parse(localStorage.getItem('adhkar_favs') || '[]'); } catch (e) {}
-let duaCat = 'الكل', duaQ = '';
+let duaCat = 'الكل', duaQ = '', duaOnly = '';
 function toggleFav(id) {
   FAVS = FAVS.includes(id) ? FAVS.filter(x => x !== id) : [...FAVS, id];
   try { localStorage.setItem('adhkar_favs', JSON.stringify(FAVS)); } catch (e) {}
@@ -1659,7 +1659,8 @@ function shareDua(id) {
   const t = d.title + '\n\n' + d.text + '\n\n— تطبيق أذكاري';
   if (navigator.share) navigator.share({ text: t }).catch(() => {}); else fbCopy(t);
 }
-function setDuaCat(c) { duaCat = c; renderDuaaList(); }
+function setDuaCat(c) { duaCat = c; duaOnly = ''; renderDuaaList(); }
+function randomDua() { const l = [...DUAAS, ...DUAS_PLUS]; duaOnly = l[Math.floor(Math.random() * l.length)].id; duaCat = 'الكل'; duaQ = ''; renderDuaaList(); const c = document.getElementById('duaa-list'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 function setDuaQ(v) { duaQ = v; renderDuaaList(true); }
 
 function renderDuaaList(keepFocus) {
@@ -1670,10 +1671,10 @@ function renderDuaaList(keepFocus) {
   const cats = ['الكل', '⭐ المفضلة', ...new Set(all.map(d => d.cat))];
   if (!keepFocus) {
     tools.innerHTML = `<input class="dua-search" type="search" placeholder="🔍 ابحث في ${all.length} دعاء..." oninput="setDuaQ(this.value)" value="${escapeHtml(duaQ)}">
-      <div class="dua-chips">${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
+      <div class="dua-chips"><button class="dua-chip ${duaOnly ? 'on' : ''}" onclick="randomDua()">🎲 عشوائي</button>${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
   }
   const q = normAr(duaQ);
-  const list = all.filter(d => (duaCat === 'الكل' || (duaCat === '⭐ المفضلة' ? FAVS.includes(d.id) : d.cat === duaCat)) &&
+  const list = all.filter(d => (!duaOnly || d.id === duaOnly) && (duaCat === 'الكل' || (duaCat === '⭐ المفضلة' ? FAVS.includes(d.id) : d.cat === duaCat)) &&
     (!q || normAr(d.title + ' ' + d.text + ' ' + d.cat).includes(q)));
   c.innerHTML = list.length ? '' : '<div class="dua-empty">لا توجد نتائج 🌙</div>';
   list.forEach(d => {
@@ -1763,3 +1764,77 @@ window.addEventListener('load', () => {
   setTimeout(() => { if ('Notification' in window && Notification.permission === 'granted') syncPush(); }, 4500);
 });
 Object.assign(window, { enablePush, syncPush, showInstallHint });
+
+// ═══ نُور UI: كشف تدريجي + تمرير الدوك + اهتزاز اللمس ═══
+(function () {
+  document.documentElement.classList.add('js-rv');
+  const SEL = '.card,.duaa-card,.dhikr-card,.ziyarat-card,.ashura-duaa,.quran-card,.stat-box,.achievement,.hadith-box,.story-card,.cl-item';
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in'); io.unobserve(e.target);
+    setTimeout(() => e.target.classList.remove('rv', 'in'), 900);
+  }), { threshold: .06 });
+  const arm = n => {
+    if (n.nodeType !== 1) return;
+    [...(n.matches(SEL) ? [n] : []), ...n.querySelectorAll(SEL)].forEach(el => {
+      if (el.dataset.rv) return; el.dataset.rv = 1; el.classList.add('rv'); io.observe(el);
+    });
+  };
+  new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(arm))).observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('load', () => arm(document.body));
+  const _go = window.go;
+  window.go = function (t) { _go(t); requestAnimationFrame(() => { const b = document.querySelector('.tab-btn.active'); if (b) b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); }); };
+  document.addEventListener('click', e => { if (navigator.vibrate && e.target.closest('.dhikr-tap,.tasbih-tap-btn,.tasbih-chip,.cl-item')) navigator.vibrate(10); });
+})();
+
+// ═══ ميزات نُور: الإعدادات + ألوان + نسخ احتياطي + مشاركة ═══
+const ACCENTS = { nur: ['نُور', '#8b5cf6,#22d3ee'], emerald: ['زمرّد', '#059669,#facc15'], ruby: ['ياقوت', '#e11d48,#f59e0b'], sand: ['رمل', '#f59e0b,#16a34a'] };
+const SITE_URL = 'https://qurandua.online/';
+function setAccent(k) {
+  document.documentElement.dataset.accent = k;
+  try { localStorage.setItem('nur_accent', k); } catch (e) {}
+  document.querySelectorAll('.nur-sw').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+}
+setAccent((function () { try { return localStorage.getItem('nur_accent') || 'nur'; } catch (e) { return 'nur'; } })());
+function openSettings() {
+  if (document.getElementById('nur-set')) return;
+  const cur = document.documentElement.dataset.accent;
+  const el = document.createElement('div'); el.id = 'nur-set'; el.className = 'nur-ov';
+  el.onclick = e => { if (e.target === el) el.remove(); };
+  el.innerHTML = `<div class="nur-sheet"><h3>⚙️ الإعدادات</h3>
+    <div class="nur-sec">🎨 لون التطبيق</div>
+    <div class="nur-acc">${Object.entries(ACCENTS).map(([k, v]) => `<button class="nur-sw ${k === cur ? 'on' : ''}" data-k="${k}" title="${v[0]}" style="background:linear-gradient(135deg,${v[1]})" onclick="setAccent('${k}')">${v[0]}</button>`).join('')}</div>
+    <div class="nur-sec">🔔 الإشعارات</div>
+    <div class="nur-row"><button class="btn btn-primary" onclick="enablePush().then(ok=>ok&&toast('✅ تم تفعيل الإشعارات'))">تفعيل الإشعارات</button><button class="btn btn-ghost" onclick="document.getElementById('nur-set').remove();openReminder()">⏰ المواعيد</button></div>
+    <div class="nur-sec">💾 بياناتي</div>
+    <div class="nur-row"><button class="btn btn-ghost" onclick="exportData()">⬇️ نسخة احتياطية</button><label class="btn btn-ghost">⬆️ استعادة<input type="file" accept=".json" hidden onchange="importData(this.files[0])"></label></div>
+    <div class="nur-sec">📲 التطبيق</div>
+    <button class="btn btn-ghost" onclick="shareApp()">مشاركة أذكاري مع أحبّتك</button>
+    <button class="btn btn-ghost nur-danger" onclick="resetAll()">🗑️ مسح كل البيانات</button>
+    <p class="nur-foot">أذكاري · qurandua.online</p></div>`;
+  document.body.appendChild(el);
+}
+function exportData() {
+  const o = { app: 'adhkari', at: new Date().toISOString(), S: JSON.parse(localStorage.getItem('adhkar_v5') || '{}'), favs: FAVS, accent: document.documentElement.dataset.accent };
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: 'application/json' }));
+  a.download = 'adhkari-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function importData(f) {
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { try { const o = JSON.parse(r.result); if (o.app !== 'adhkari' || !o.S) throw 0;
+    localStorage.setItem('adhkar_v5', JSON.stringify(o.S)); localStorage.setItem('adhkar_favs', JSON.stringify(o.favs || [])); if (o.accent) localStorage.setItem('nur_accent', o.accent);
+    toast('✅ تمت الاستعادة'); setTimeout(() => location.reload(), 700); } catch (e) { toast('⚠️ ملف غير صالح'); } };
+  r.readAsText(f);
+}
+function shareApp() {
+  const d = { title: 'أذكاري', text: 'أذكاري – رفيقك الإسلامي اليومي: أذكار، أدعية، ختمة، أوقات الصلاة ومساعد ديني', url: SITE_URL };
+  if (navigator.share) navigator.share(d).catch(() => {}); else fbCopy(SITE_URL);
+}
+function resetAll() { if (confirm('سيتم مسح كل تقدمك وإعداداتك نهائياً. متأكد؟')) { localStorage.clear(); location.reload(); } }
+window.addEventListener('DOMContentLoaded', () => {
+  const nr = document.querySelector('.nav-right'); if (!nr) return;
+  const ai = nr.querySelector('[onclick="go(\'ai\')"]'); if (ai) ai.remove();
+  const b = document.createElement('button'); b.className = 'nav-btn'; b.title = 'الإعدادات'; b.textContent = '⚙️'; b.onclick = openSettings; nr.appendChild(b);
+});
+Object.assign(window, { openSettings, setAccent, exportData, importData, shareApp, resetAll, randomDua });

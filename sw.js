@@ -3,8 +3,8 @@
    ══════════════════════════════════════════════════════ */
 'use strict';
 
-const CACHE = 'adhkar-v11';
-const ASSETS = ['./', './index.html', './style.css', './premium.css', './config.js', './icon-192.png', './app.js', './manifest.json'];
+const CACHE = 'adhkar-v13';
+const ASSETS = ['./', './index.html', './style.css', './nur.css', './config.js', './icon-192.png', './app.js', './manifest.json'];
 
 /* ── إشعارات مجدولة (الأوقات) ── */
 const NOTIF_MESSAGES = {

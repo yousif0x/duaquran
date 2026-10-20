@@ -1,0 +1,183 @@
+/* ═══════ نُور — Celestial Design System v3 ═══════ */
+:root{
+ --bg:#fbf7ef;--bg2:#f2ead9;--card:rgba(255,253,248,.88);--text:#1b1740;--text2:#4b4672;--muted:#7a7699;--light:#a19eb8;
+ --border:rgba(67,56,202,.15);--border2:rgba(183,121,31,.45);
+ --g1:#3730a3;--g2:#4f46e5;--g3:#6366f1;--g4:#a5b4fc;--gold:#b7791f;--gold-lt:#f5c451;--gold-pale:#fff4d6;
+ --aur1:#8b5cf6;--aur2:#22d3ee;--aur3:#f472b6;
+ --grad:linear-gradient(135deg,#8b5cf6,#22d3ee);--gold-grad:linear-gradient(135deg,#ffe08a,#f5b83d 55%,#d98e1a);
+ --shadow-sm:0 2px 14px rgba(55,48,163,.08);--shadow:0 14px 44px rgba(55,48,163,.16);--shadow-lg:0 26px 80px rgba(55,48,163,.24);
+ --r-sm:12px;--r:20px;--r-lg:28px;--r-xl:36px;--ease:cubic-bezier(.2,.8,.2,1);
+ --star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg fill='%23f5c451'%3E%3Ccircle cx='20' cy='30' r='1'/%3E%3Ccircle cx='90' cy='12' r='.8'/%3E%3Ccircle cx='140' cy='70' r='1.2'/%3E%3Ccircle cx='60' cy='120' r='.9'/%3E%3Ccircle cx='120' cy='140' r='.7'/%3E%3C/g%3E%3C/svg%3E");
+ --octa:polygon(50% 0,61% 20%,85% 15%,80% 39%,100% 50%,80% 61%,85% 85%,61% 80%,50% 100%,39% 80%,15% 85%,20% 61%,0 50%,20% 39%,15% 15%,39% 20%);
+}
+html.dark,body.dark{
+ --bg:#070816;--bg2:#0d1030;--card:rgba(22,24,66,.55);--text:#f4f0ff;--text2:#bdb9e0;--muted:#8c88b3;--light:#6b6890;
+ --border:rgba(167,139,250,.2);--border2:rgba(245,196,81,.38);--g1:#c4b5fd;--g2:#a78bfa;--g3:#8b5cf6;--g4:#22d3ee;--gold:#f5c451;
+ --shadow-sm:0 2px 14px rgba(0,0,0,.4);--shadow:0 14px 44px rgba(0,0,0,.55);--shadow-lg:0 26px 80px rgba(0,0,0,.65)}
+html{color-scheme:light}html.dark{color-scheme:dark}
+body{background:var(--bg);font-family:'Cairo','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:-20%;z-index:-2;pointer-events:none;filter:blur(24px);opacity:.55;animation:aur 28s ease-in-out infinite alternate;
+ background:radial-gradient(40% 35% at 15% 10%,rgba(139,92,246,.4),transparent 70%),radial-gradient(35% 30% at 90% 22%,rgba(34,211,238,.28),transparent 70%),radial-gradient(45% 40% at 70% 100%,rgba(244,114,182,.22),transparent 70%)}
+html.dark body::before{opacity:1}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--star);opacity:.14}html.dark body::after{opacity:.6}
+@keyframes aur{to{transform:translate3d(-4%,3%,0) rotate(6deg) scale(1.1)}}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes shine{to{background-position:-200% 0}}
+@keyframes rise{from{opacity:0;transform:translateY(20px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes pulse{50%{opacity:.45}}@keyframes ring{0%{box-shadow:0 0 0 0 rgba(245,184,61,.55)}100%{box-shadow:0 0 0 26px rgba(245,184,61,0)}}
+/* ── الصفحة الأولى ── */
+.hero-bg{background:radial-gradient(70% 50% at 50% 0%,#2e2278,transparent 70%),radial-gradient(50% 40% at 100% 100%,#0e5a73,transparent 70%),#050612!important}
+.hero-moon{display:inline-block;position:relative;font-size:4.6rem;filter:drop-shadow(0 0 30px rgba(245,196,81,.85));animation:none}
+.hero-moon::before,.hero-moon::after{content:"";position:absolute;border-radius:50%;inset:-28px;border:1px dashed rgba(245,196,81,.55);animation:spin 40s linear infinite}
+.hero-moon::after{inset:-50px;border:1px solid rgba(139,92,246,.45);animation-direction:reverse}
+.hero-title{font-family:'Reem Kufi','Amiri',serif!important;font-size:4.4rem!important;background:linear-gradient(110deg,#fff,#ffe08a 38%,#c4b5fd 68%,#fff);background-size:200% 100%;
+ -webkit-background-clip:text;background-clip:text;color:transparent!important;animation:shine 7s linear infinite}
+.hero-verse{font-family:'Amiri Quran','Amiri',serif;color:#ffe08a;font-size:1.35rem;line-height:2.3}
+.hero-badge{border-radius:99px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(10px);color:#e9e5ff}
+.btn-hero-start{border-radius:99px;padding:1rem 2.4rem;font:900 1.15rem 'Cairo';animation:ring 2.4s infinite}
+/* ── الشريط العلوي وأوقات الصلاة ── */
+.navbar{position:sticky;top:calc(8px + env(safe-area-inset-top,0px));margin:8px 10px 0;z-index:800;border-radius:26px;border:1px solid var(--border)!important;
+ background:var(--card)!important;backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);box-shadow:var(--shadow-sm)}
+.nav-title-text{font-family:'Reem Kufi',serif;font-size:1.5rem;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-logo{color:var(--gold-lt);filter:drop-shadow(0 0 10px rgba(245,196,81,.7))}
+.nav-btn{border-radius:14px;transition:transform .25s var(--ease),background .25s}.nav-btn:hover,.nav-btn.active{transform:scale(1.12);background:rgba(139,92,246,.18)}
+.nav-streak{border-radius:99px;padding:.25rem .8rem;background:rgba(245,196,81,.16);border:1px solid var(--border2);font-weight:800}
+.prayer-bar{margin:10px;border-radius:26px;border:1px solid var(--border)!important;background:var(--card)!important;backdrop-filter:blur(18px);box-shadow:var(--shadow-sm)}
+.prayer-item{border-radius:18px;transition:all .35s var(--ease)}.prayer-time{font-weight:800;font-variant-numeric:tabular-nums}
+.prayer-item.active,.prayer-item.next{background:var(--gold-grad);color:#2a1a02;box-shadow:0 8px 26px rgba(245,184,61,.45);transform:translateY(-3px)}
+.athan-btn{border-radius:99px;border:1px solid var(--border2);background:rgba(245,196,81,.14);color:var(--gold);font-weight:800}
+/* ── الدوك السفلي ── */
+.main,main{padding-bottom:8rem}
+.tab-bar{position:fixed!important;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 20px);z-index:900;
+ display:flex;gap:.25rem;padding:.4rem;border-radius:99px;overflow-x:auto;scrollbar-width:none;background:rgba(10,12,40,.74)!important;
+ backdrop-filter:blur(26px) saturate(1.8);-webkit-backdrop-filter:blur(26px) saturate(1.8);border:1px solid rgba(255,255,255,.15)!important;
+ box-shadow:0 22px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.14)}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex:none;display:flex;flex-direction:row;align-items:center;gap:.4rem;padding:.62rem .78rem;border:0!important;border-radius:99px;background:transparent;color:#c9c5ee;font:700 .82rem 'Cairo';transition:all .4s var(--ease)}
+.tab-btn>span:last-child{display:none}.tab-btn .ti{font-size:1.3rem}
+.tab-btn.active{background:var(--grad)!important;color:#fff!important;padding-inline:1.05rem;box-shadow:0 8px 26px rgba(139,92,246,.6)}
+.tab-btn.active>span:last-child{display:inline}
+.tab-content{padding-inline:.9rem;max-width:780px;margin-inline:auto}.tab-content.active{animation:rise .55s var(--ease)}
+/* ── العناوين ── */
+.sec-header{text-align:center;padding:1.8rem 0 1.1rem}
+.sec-icon{display:grid;place-items:center;width:70px;height:70px;margin:0 auto .7rem;font-size:2rem;border-radius:26px;background:var(--grad);box-shadow:0 14px 40px rgba(139,92,246,.5);transform:rotate(-6deg)}
+.sec-header h2{font-family:'Reem Kufi','Amiri',serif;font-size:2.1rem;color:var(--g1)!important}
+.sec-header p{font-family:'Amiri Quran','Amiri',serif;color:var(--gold)!important;font-size:1.05rem}
+.sec-sub{font-family:'Reem Kufi',serif;font-size:1.3rem;color:var(--gold);margin:1.8rem 0 .9rem;display:flex;align-items:center;gap:.8rem}
+.sec-sub::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+/* ── البطاقات ── */
+.card,.duaa-card,.dhikr-card,.ziyarat-card,.ashura-duaa,.sajdah-box,.stat-box,.stats-card,.achievement,.hadith-box,.quran-card,.cl-item,.counter-box,.story-card,
+.ramadan-tracker-card,.ramadan-goals-card,.wird-card,.chat-box,.install-guide,.reciter-chip{position:relative;background:var(--card)!important;border:1px solid var(--border)!important;
+ border-radius:var(--r-lg);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);box-shadow:var(--shadow-sm);transition:transform .4s var(--ease),box-shadow .4s,border-color .4s}
+.duaa-card:hover,.dhikr-card:hover,.quran-card:hover,.stat-box:hover,.card:hover{transform:translateY(-4px);border-color:var(--border2)!important;box-shadow:var(--shadow)}
+.duaa-card{padding:1.6rem 1.4rem 1.3rem;margin-bottom:1.1rem;overflow:hidden}
+.duaa-card::before{content:"";position:absolute;top:20px;bottom:20px;inset-inline-start:0;width:4px;border-radius:4px;background:var(--grad)}
+.duaa-category{font-weight:700;color:var(--muted)}.duaa-category em{font-style:normal;color:var(--gold)}
+.duaa-title{font-family:'Reem Kufi',serif;font-size:1.3rem!important;color:var(--gold)!important}
+.duaa-text,.ziyarat-text,.ashura-duaa-text,.sajdah-text,.ayah-text,.hadith-text,.arabic-xl,.arabic-lg{font-family:'Amiri Quran','Amiri',serif!important;line-height:2.6!important}
+.duaa-text{font-size:1.5rem!important;text-align:center;color:var(--text)}
+.ziyarat-text,.ashura-duaa-text,.sajdah-text{font-size:1.4rem}
+/* ── بطاقات Hero ── */
+.ayah-day,.khatmah-hero,.ai-hero,.istikhara-hero,.hijri-card,.friday-title,.countdown-card{position:relative;overflow:hidden;border-radius:var(--r-xl);color:#fff!important;
+ background:linear-gradient(135deg,#2e1f7a,#4c2fb8 48%,#0e7490)!important;border:1px solid rgba(255,255,255,.2);box-shadow:0 26px 70px rgba(76,47,184,.45)}
+.ayah-day::before,.khatmah-hero::before,.ai-hero::before,.istikhara-hero::before{content:"";position:absolute;width:260px;height:260px;top:-90px;inset-inline-end:-70px;border-radius:50%;
+ background:radial-gradient(circle,rgba(255,224,138,.4),transparent 70%);pointer-events:none}
+.ayah-day-text{font-family:'Amiri Quran','Amiri',serif;font-size:1.75rem;line-height:2.5;color:#ffe08a}
+.ashura-hero{position:relative;overflow:hidden;border-radius:var(--r-xl);color:#ffe9c7!important;border:1px solid rgba(245,196,81,.4);
+ background:radial-gradient(60% 80% at 80% 0%,rgba(220,38,38,.35),transparent 70%),linear-gradient(160deg,#10040a,#4a0d1f 55%,#1a0510)!important;box-shadow:0 26px 70px rgba(120,10,30,.5)}
+.ashura-title,.ziyarat-section-title,.ashura-duaa-title,.ziyarat-badge{font-family:'Reem Kufi',serif;color:#fca5a5!important}
+.ziyarat-card,.ashura-duaa,.sajdah-box{border-color:rgba(248,113,113,.3)!important}
+#tab-sleep .sleep-dhikr-card,.sleep-badge{background:radial-gradient(circle at 80% 0%,rgba(165,180,252,.25),transparent 60%),linear-gradient(160deg,#060a24,#1a1f5c)!important;color:#e5e9ff!important;border-color:rgba(165,180,252,.3)!important}
+#tab-sleep .sec-icon{background:linear-gradient(135deg,#a5b4fc,#6366f1)}
+/* ── الأزرار ── */
+.btn{border-radius:14px;font-weight:700;transition:transform .2s var(--ease),box-shadow .25s}.btn:active,.tasbih-tap-btn:active,.dhikr-tap:active{transform:scale(.95)}
+.btn-primary,.btn-purple,.khatmah-done-btn{background:var(--grad)!important;color:#fff!important;border:0!important;box-shadow:0 8px 26px rgba(99,102,241,.42)}
+.btn-gold,.btn-primary.done,.khatmah-read-btn,.dhikr-tap,.tasbih-tap-btn,.pomo-btn,.chat-send-btn{background:var(--gold-grad)!important;color:#2a1a02!important;border:0!important;font-weight:800;box-shadow:0 10px 30px rgba(245,184,61,.42)}
+.btn-ghost,.dhikr-reset,.tasbih-reset-btn,.khatmah-reset-btn{background:rgba(139,92,246,.1)!important;border:1px solid var(--border)!important;color:var(--text)!important}
+.btn.fav{color:var(--gold)!important;border-color:var(--gold)!important}
+.dhikr-tap,.pomo-btn,.chat-send-btn{border-radius:18px}
+/* ── العدادات والتقدم ── */
+.dhikr-word,.counter-dhikr,.tasbih-word,.wird-name{font-family:'Amiri Quran','Amiri',serif;color:var(--gold)}
+.dhikr-num,.counter-num,.tasbih-big,.khatmah-pct-big,.pomo-time-big,.stat-num,.stat-qk-val{font-weight:900;font-variant-numeric:tabular-nums;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dhikr-bar-wrap,.khatmah-bar-outer,.tasbih-prog-wrap{background:rgba(139,92,246,.16);border-radius:99px;overflow:hidden}
+.dhikr-bar,.khatmah-bar-inner,.tasbih-prog{background:linear-gradient(90deg,#8b5cf6,#22d3ee,#ffe08a)!important;border-radius:99px;box-shadow:0 0 16px rgba(34,211,238,.6)}
+.tasbih-tap-btn{width:200px;height:200px;border-radius:50%;box-shadow:0 0 0 12px rgba(245,196,81,.14),0 0 0 28px rgba(139,92,246,.1),0 24px 70px rgba(245,184,61,.5)}
+.tasbih-chip,.juz-chip,.dua-chip,.quick-q-btn{border-radius:99px;border:1px solid var(--border2);background:var(--card);color:var(--text2);font-weight:700;transition:all .3s var(--ease)}
+.tasbih-chip.active,.juz-chip.active,.dua-chip.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 6px 20px rgba(139,92,246,.45)}
+.tracker-circle{filter:drop-shadow(0 0 22px rgba(34,211,238,.45))}
+.cl-item.done,.cl-item.checked{border-color:var(--gold)!important;background:linear-gradient(90deg,rgba(245,196,81,.2),var(--card))!important}
+.week-dot.on,.week-dot.done{background:var(--gold-grad);box-shadow:0 0 14px rgba(245,196,81,.7)}
+.chart-col{border-radius:10px 10px 0 0;background:linear-gradient(#22d3ee,#8b5cf6)}
+.achievement{text-align:center}.achievement.locked{opacity:.45;filter:grayscale(.7)}
+/* ── القرآن والاستخارة ── */
+.quran-grid{gap:.85rem}.quran-name{font-family:'Reem Kufi',serif;font-size:1.25rem}
+.quran-num,.step-num{display:grid;place-items:center;font-weight:900;color:#2a1a02;background:var(--gold-grad);clip-path:var(--octa);width:46px;height:46px;flex:none}
+.step-row{display:flex;gap:.9rem;align-items:center;padding:.65rem 0}
+.kd-btn{border-radius:14px;border:1px solid var(--border2);background:var(--card);color:var(--text)}.kd-btn.done,.kd-btn.today{background:var(--grad);color:#fff;border-color:transparent}
+.reader-text{font-family:'Amiri Quran','Amiri',serif;font-size:2rem;line-height:3;text-align:center}
+.reader-bismillah{font-family:'Amiri Quran',serif;color:var(--gold)}
+.modal-sheet,.notif-modal{border-radius:34px 34px 0 0;background:var(--bg2)!important;border-top:2px solid var(--gold);box-shadow:0 -24px 70px rgba(0,0,0,.55);backdrop-filter:blur(24px)}
+.modal-sheet::before,.notif-modal::before{content:"";display:block;width:46px;height:5px;border-radius:9px;background:var(--border2);margin:0 auto .9rem}
+[id$="-overlay"]{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(4,4,22,.62)!important}
+/* ── المساعد الذكي ── */
+.chat-box{overflow:hidden;border-radius:30px}
+.chat-msg{display:flex;gap:.6rem;margin:.8rem 0;animation:rise .4s var(--ease)}.chat-msg.user{flex-direction:row-reverse}
+.chat-avatar{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2)}
+.chat-bubble{max-width:88%;padding:.85rem 1.15rem;line-height:2.05;border-radius:22px 22px 22px 6px;background:var(--bg2);border:1px solid var(--border)}
+.chat-msg.user .chat-bubble{border-radius:22px 22px 6px 22px;background:var(--grad);color:#fff;border:0;box-shadow:0 8px 24px rgba(99,102,241,.4)}
+.chat-msg.typing .chat-bubble{animation:pulse 1.2s infinite}
+.chat-input-bar{background:var(--card);border-top:1px solid var(--border);backdrop-filter:blur(16px)}
+/* ── الحقول ── */
+.quran-search,.global-search,.istikhara-textarea,.chat-input,.dua-search{border-radius:20px!important;border:1px solid var(--border2)!important;background:var(--card)!important;color:var(--text)!important;font-family:'Cairo'!important;transition:box-shadow .25s}
+.dua-search{width:100%;padding:1rem 1.3rem;margin-bottom:.9rem;font-weight:600;outline:0}
+.quran-search:focus,.global-search:focus,.istikhara-textarea:focus,.chat-input:focus,.dua-search:focus{outline:0;border-color:#22d3ee!important;box-shadow:0 0 0 4px rgba(34,211,238,.28)}
+.dua-chips{display:flex;gap:.5rem;overflow-x:auto;padding:.2rem .1rem 1rem;scrollbar-width:none}.dua-chips::-webkit-scrollbar{display:none}
+.dua-chip{flex:none;padding:.5rem 1.05rem;font-size:.85rem;cursor:pointer}.dua-empty{text-align:center;color:var(--muted);padding:2.6rem 0;font-size:1.1rem}
+.toast{border-radius:99px!important;background:rgba(10,12,40,.9)!important;color:#ffe08a!important;border:1px solid var(--gold)!important;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.ios-hint{position:fixed;inset-inline:12px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:3000;padding:1rem 1.2rem;border-radius:24px;color:#fff;background:linear-gradient(135deg,#2e1f7a,#0e7490);
+ border:1px solid var(--gold);box-shadow:0 20px 60px rgba(0,0,0,.55);font:600 .92rem/1.9 'Cairo'}
+.ios-hint ol{margin:.4rem 1.2rem .6rem}.ios-hint button{background:var(--gold-grad);color:#2a1a02;border:0;border-radius:14px;padding:.45rem 1.3rem;font:800 .9rem 'Cairo'}
+/* ── كشف تدريجي ── */
+.js-rv .rv{opacity:0;transform:translateY(28px) scale(.98);transition:opacity .7s var(--ease),transform .7s var(--ease)}.js-rv .rv.in{opacity:1;transform:none}
+:focus-visible{outline:2px solid var(--gold-lt);outline-offset:3px;border-radius:12px}
+::selection{background:var(--aur1);color:#fff}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+@media(min-width:900px){.tab-content{max-width:960px}.quran-grid{grid-template-columns:repeat(3,1fr)!important}.hero-title{font-size:5.4rem!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ═══ إكمال وإصلاحات: كل الواجهات والطبقات المنبثقة ═══ */
+:root{--hero:linear-gradient(135deg,#2e1f7a,#4c2fb8 48%,#0e7490)}
+html[data-accent=emerald]{--aur1:#10b981;--aur2:#facc15;--grad:linear-gradient(135deg,#059669,#34d399);--hero:linear-gradient(135deg,#064e3b,#0f766e 50%,#a16207);--g2:#059669;--g3:#10b981}
+html[data-accent=ruby]{--aur1:#e11d48;--aur2:#f59e0b;--grad:linear-gradient(135deg,#e11d48,#f59e0b);--hero:linear-gradient(135deg,#4c0519,#9f1239 50%,#b45309);--g2:#e11d48;--g3:#fb7185}
+html[data-accent=sand]{--aur1:#d97706;--aur2:#16a34a;--grad:linear-gradient(135deg,#f59e0b,#b45309);--hero:linear-gradient(135deg,#451a03,#92400e 50%,#365314);--g2:#b45309;--g3:#d97706}
+html.dark[data-accent=emerald]{--g1:#6ee7b7;--g2:#34d399;--g3:#10b981;--g4:#facc15}html.dark[data-accent=ruby]{--g1:#fda4af;--g2:#fb7185;--g3:#e11d48;--g4:#fbbf24}
+html.dark[data-accent=sand]{--g1:#fcd34d;--g2:#fbbf24;--g3:#f59e0b;--g4:#86efac}
+body::before{background:radial-gradient(40% 35% at 15% 10%,color-mix(in srgb,var(--aur1) 40%,transparent),transparent 70%),radial-gradient(35% 30% at 90% 22%,color-mix(in srgb,var(--aur2) 28%,transparent),transparent 70%),radial-gradient(45% 40% at 70% 100%,rgba(244,114,182,.2),transparent 70%)}
+.ayah-day,.khatmah-hero,.ai-hero,.istikhara-hero,.hijri-card,.friday-title,.countdown-card{background:var(--hero)!important}
+.btn-hero-start{background:var(--gold-grad)!important;color:#2a1a02!important;border:0!important;box-shadow:0 14px 44px rgba(245,184,61,.5)}
+.prayer-bar{display:flex!important;flex-direction:column;gap:.55rem;padding:.7rem}
+.prayer-list{display:grid!important;grid-template-columns:repeat(5,1fr);gap:.35rem;width:100%}
+.prayer-item{text-align:center;padding:.5rem .1rem;min-width:0}
+.prayer-name{color:var(--muted);font-size:.72rem;font-weight:700}.prayer-time{color:var(--text);font-size:.98rem}
+.prayer-item.active .prayer-name,.prayer-item.next .prayer-name,.prayer-item.active .prayer-time,.prayer-item.next .prayer-time{color:#2a1a02}
+.athan-btn{align-self:center;padding:.3rem 1.3rem;font-size:.8rem}
+.navbar{z-index:400}.tab-bar{z-index:450}
+.font-controls{bottom:calc(94px + env(safe-area-inset-bottom,0px))!important;flex-direction:row!important;z-index:420}
+.font-ctrl{background:var(--card)!important;color:var(--text)!important;backdrop-filter:blur(12px);border-radius:14px}
+.toast{bottom:calc(98px + env(safe-area-inset-bottom,0px))!important}
+.ai-fab{bottom:calc(94px + env(safe-area-inset-bottom,0px))!important;background:var(--grad)!important;color:#fff!important;border:0!important;border-radius:99px;box-shadow:0 14px 40px rgba(99,102,241,.55);z-index:420}
+.install-banner{bottom:calc(92px + env(safe-area-inset-bottom,0px))!important}
+.install-banner-inner{background:var(--hero)!important;border:1px solid var(--gold);border-radius:24px;color:#fff}
+.tasbih-overlay{background:radial-gradient(70% 55% at 50% 30%,#3b2a9a,#0a0b30 60%,#04050f)!important}
+.dhikr-card button:not(.dhikr-tap){background:rgba(139,92,246,.12)!important;color:var(--text)!important;border:1px solid var(--border)!important;border-radius:14px;padding:.6rem .9rem;white-space:nowrap}
+.nur-ov{position:fixed;inset:0;z-index:700;background:rgba(4,4,22,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;animation:fade .3s}
+.nur-sheet{width:min(100%,560px);max-height:88vh;overflow:auto;padding:1.1rem 1.4rem calc(1.6rem + env(safe-area-inset-bottom,0px));border-radius:34px 34px 0 0;background:var(--bg2);border-top:2px solid var(--gold);animation:up .45s var(--ease);color:var(--text);box-shadow:0 -24px 70px rgba(0,0,0,.5)}
+.nur-sheet::before{content:"";display:block;width:46px;height:5px;border-radius:9px;background:var(--border2);margin:0 auto .9rem}
+.nur-sheet h3{font:800 1.6rem 'Reem Kufi',serif;text-align:center;color:var(--gold);margin-bottom:.4rem}
+.nur-sec{margin:1.2rem 0 .55rem;font-weight:800;color:var(--text2)}
+.nur-acc{display:flex;gap:.7rem;flex-wrap:wrap}.nur-sw{width:62px;height:62px;border-radius:22px;border:2px solid transparent;cursor:pointer;font-size:0;transition:transform .3s var(--ease)}
+.nur-sw:hover{transform:scale(1.08)}.nur-sw.on{border-color:var(--gold-lt);box-shadow:0 0 0 4px rgba(245,196,81,.3)}
+.nur-row{display:flex;gap:.6rem;flex-wrap:wrap}.nur-row .btn{flex:1;text-align:center;cursor:pointer;padding:.8rem;min-width:140px}
+.nur-sheet .btn{display:block;width:100%;padding:.8rem}.nur-sheet .nur-row .btn{width:auto}
+.nur-danger{margin-top:.6rem;color:#f87171!important}.nur-foot{text-align:center;color:var(--muted);font-size:.8rem;margin-top:1.1rem}
+@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(100%)}}
+.ziyarat-text,.ashura-duaa-text,.sajdah-text{background:rgba(139,92,246,.07)!important;border:1px solid var(--border);border-radius:20px;color:var(--text)!important}
+html.dark .ziyarat-text,html.dark .ashura-duaa-text,html.dark .sajdah-text{background:rgba(0,0,0,.3)!important}

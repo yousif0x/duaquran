@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /cron
+Disallow: /ai
+Sitemap: https://qurandua.online/sitemap.xml
