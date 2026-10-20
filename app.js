@@ -1655,23 +1655,23 @@ function toggleFav(id) {
   renderDuaaList();
 }
 function shareDua(id) {
-  const d = allDuas().find(x => x.id === id); if (!d) return;
+  const d = [...DUAAS, ...DUAS_PLUS].find(x => x.id === id); if (!d) return;
   const t = d.title + '\n\n' + d.text + '\n\n— تطبيق أذكاري';
   if (navigator.share) navigator.share({ text: t }).catch(() => {}); else fbCopy(t);
 }
 function setDuaCat(c) { duaCat = c; duaOnly = ''; renderDuaaList(); }
-function randomDua() { const l = allDuas(); duaOnly = l[Math.floor(Math.random() * l.length)].id; duaCat = 'الكل'; duaQ = ''; renderDuaaList(); const c = document.getElementById('duaa-list'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+function randomDua() { const l = [...DUAAS, ...DUAS_PLUS]; duaOnly = l[Math.floor(Math.random() * l.length)].id; duaCat = 'الكل'; duaQ = ''; renderDuaaList(); const c = document.getElementById('duaa-list'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 function setDuaQ(v) { duaQ = v; renderDuaaList(true); }
 
 function renderDuaaList(keepFocus) {
   const c = document.getElementById('duaa-list'); if (!c) return;
-  const all = allDuas();
+  const all = [...DUAAS, ...DUAS_PLUS];
   let tools = document.getElementById('duaa-tools');
   if (!tools) { tools = document.createElement('div'); tools.id = 'duaa-tools'; c.parentNode.insertBefore(tools, c); }
   const cats = ['الكل', '⭐ المفضلة', ...new Set(all.map(d => d.cat))];
   if (!keepFocus) {
-    tools.innerHTML = `<input class="dua-search" type="search" placeholder="ابحث في ${all.length} دعاء..." oninput="setDuaQ(this.value)" value="${escapeHtml(duaQ)}">
-      <div class="dua-chips"><button class="dua-chip ${duaOnly ? 'on' : ''}" onclick="randomDua()">دعاء عشوائي</button><button class="dua-chip" onclick="addCustomDua()">+ أضف دعاءك</button>${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
+    tools.innerHTML = `<input class="dua-search" type="search" placeholder="🔍 ابحث في ${all.length} دعاء..." oninput="setDuaQ(this.value)" value="${escapeHtml(duaQ)}">
+      <div class="dua-chips"><button class="dua-chip ${duaOnly ? 'on' : ''}" onclick="randomDua()">🎲 عشوائي</button>${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
   }
   const q = normAr(duaQ);
   const list = all.filter(d => (!duaOnly || d.id === duaOnly) && (duaCat === 'الكل' || (duaCat === '⭐ المفضلة' ? FAVS.includes(d.id) : d.cat === duaCat)) &&
@@ -1685,9 +1685,7 @@ function renderDuaaList(keepFocus) {
       <div class="duaa-text">${d.text.replace(/\n/g, '<br>')}</div>
       <div class="card-actions">
         <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
-        <button class="btn btn-ghost" onclick="shareDua('${d.id}')">مشاركة</button>
-        <button class="btn btn-ghost" onclick="speakDua('${d.id}')">استماع</button>
-        <button class="btn btn-ghost" onclick="shareDuaImage('${d.id}')">صورة</button>${d.custom ? `<button class="btn btn-ghost" onclick="delCustom('${d.id}')">حذف</button>` : ''}
+        <button class="btn btn-ghost" onclick="shareDua('${d.id}')">📤 مشاركة</button>
         <button class="btn btn-ghost ${fav ? 'fav' : ''}" onclick="toggleFav('${d.id}')">${fav ? '⭐' : '☆'}</button>
         <button class="btn btn-primary ${done ? 'done' : ''}" onclick="markRead(this,'duaa-${d.id}','${getCkKey(d.id)}')">✅ تمت القراءة</button>
       </div>`;
@@ -1790,22 +1788,22 @@ Object.assign(window, { enablePush, syncPush, showInstallHint });
 })();
 
 // ═══ ميزات نُور: الإعدادات + ألوان + نسخ احتياطي + مشاركة ═══
-const ACCENTS = { ink: ['حبر ولازورد', '#1e4d5c'], olive: ['زيتوني', '#4a5d23'], wine: ['عنّابي', '#7a2433'], slate: ['فحمي', '#3a4256'] };
+const ACCENTS = { nur: ['نُور', '#8b5cf6,#22d3ee'], emerald: ['زمرّد', '#059669,#facc15'], ruby: ['ياقوت', '#e11d48,#f59e0b'], sand: ['رمل', '#f59e0b,#16a34a'] };
 const SITE_URL = 'https://qurandua.online/';
 function setAccent(k) {
   document.documentElement.dataset.accent = k;
   try { localStorage.setItem('nur_accent', k); } catch (e) {}
   document.querySelectorAll('.nur-sw').forEach(b => b.classList.toggle('on', b.dataset.k === k));
 }
-setAccent((function () { try { return localStorage.getItem('nur_accent') || 'ink'; } catch (e) { return 'ink'; } })());
+setAccent((function () { try { return localStorage.getItem('nur_accent') || 'nur'; } catch (e) { return 'nur'; } })());
 function openSettings() {
   if (document.getElementById('nur-set')) return;
   const cur = document.documentElement.dataset.accent;
   const el = document.createElement('div'); el.id = 'nur-set'; el.className = 'nur-ov';
   el.onclick = e => { if (e.target === el) el.remove(); };
   el.innerHTML = `<div class="nur-sheet"><h3>⚙️ الإعدادات</h3>
-    <div class="nur-sec">المظهر</div><div class="nur-row">${[['light','فاتح'],['dark','ليلي مريح'],['auto','تلقائي']].map(([k,t])=>`<button class="btn btn-ghost nur-th" data-m="${k}" onclick="setTheme('${k}')">${t}</button>`).join('')}</div><div class="nur-sec">لون التطبيق</div>
-    <div class="nur-acc">${Object.entries(ACCENTS).map(([k, v]) => `<button class="nur-sw ${k === cur ? 'on' : ''}" data-k="${k}" title="${v[0]}" style="background:${v[1]}" onclick="setAccent('${k}')">${v[0]}</button>`).join('')}</div>
+    <div class="nur-sec">🎨 لون التطبيق</div>
+    <div class="nur-acc">${Object.entries(ACCENTS).map(([k, v]) => `<button class="nur-sw ${k === cur ? 'on' : ''}" data-k="${k}" title="${v[0]}" style="background:linear-gradient(135deg,${v[1]})" onclick="setAccent('${k}')">${v[0]}</button>`).join('')}</div>
     <div class="nur-sec">🔔 الإشعارات</div>
     <div class="nur-row"><button class="btn btn-primary" onclick="enablePush().then(ok=>ok&&toast('✅ تم تفعيل الإشعارات'))">تفعيل الإشعارات</button><button class="btn btn-ghost" onclick="document.getElementById('nur-set').remove();openReminder()">⏰ المواعيد</button></div>
     <div class="nur-sec">💾 بياناتي</div>
@@ -1814,7 +1812,7 @@ function openSettings() {
     <button class="btn btn-ghost" onclick="shareApp()">مشاركة أذكاري مع أحبّتك</button>
     <button class="btn btn-ghost nur-danger" onclick="resetAll()">🗑️ مسح كل البيانات</button>
     <p class="nur-foot">أذكاري · qurandua.online</p></div>`;
-  document.body.appendChild(el); markTheme();
+  document.body.appendChild(el);
 }
 function exportData() {
   const o = { app: 'adhkari', at: new Date().toISOString(), S: JSON.parse(localStorage.getItem('adhkar_v5') || '{}'), favs: FAVS, accent: document.documentElement.dataset.accent };
@@ -1837,69 +1835,6 @@ function resetAll() { if (confirm('سيتم مسح كل تقدمك وإعداد�
 window.addEventListener('DOMContentLoaded', () => {
   const nr = document.querySelector('.nav-right'); if (!nr) return;
   const ai = nr.querySelector('[onclick="go(\'ai\')"]'); if (ai) ai.remove();
-  const b = document.createElement('button'); b.className = 'nav-btn'; b.title = 'الإعدادات'; b.setAttribute('onclick', 'openSettings()'); nr.appendChild(b);
+  const b = document.createElement('button'); b.className = 'nav-btn'; b.title = 'الإعدادات'; b.textContent = '⚙️'; b.onclick = openSettings; nr.appendChild(b);
 });
 Object.assign(window, { openSettings, setAccent, exportData, importData, shareApp, resetAll, randomDua });
-
-// ═══ مِداد: مظهر تلقائي + أدعيتي + استماع + مشاركة كصورة + تنظيف الأيقونات ═══
-let CUSTOM = []; try { CUSTOM = JSON.parse(localStorage.getItem('adhkari_custom') || '[]'); } catch (e) {}
-function allDuas() { return [...DUAAS, ...DUAS_PLUS, ...CUSTOM]; }
-const sysDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
-function applyTheme() {
-  const m = localStorage.getItem('nur_theme') || 'auto';
-  S.darkMode = m === 'auto' ? sysDark() : m === 'dark'; applyDark();
-  const t = document.querySelector('meta[name=theme-color]'); if (t) t.content = S.darkMode ? '#16130f' : '#f3eee1';
-}
-function markTheme() { const m = localStorage.getItem('nur_theme') || 'auto'; document.querySelectorAll('.nur-th').forEach(b => b.classList.toggle('on', b.dataset.m === m)); }
-function setTheme(m) { try { localStorage.setItem('nur_theme', m); } catch (e) {} applyTheme(); markTheme(); }
-window.toggleDark = () => setTheme(S.darkMode ? 'light' : 'dark');
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if ((localStorage.getItem('nur_theme') || 'auto') === 'auto') applyTheme(); });
-window.addEventListener('DOMContentLoaded', () => setTimeout(applyTheme, 0));
-function sheet(html) {
-  const el = document.createElement('div'); el.className = 'nur-ov'; el.onclick = e => { if (e.target === el) el.remove(); };
-  el.innerHTML = '<div class="nur-sheet">' + html + '</div>'; document.body.appendChild(el); return el;
-}
-function addCustomDua() {
-  const el = sheet('<h3>أضف دعاءك</h3><input id="cd-t" placeholder="العنوان (مثال: دعائي للتوفيق)"><textarea id="cd-x" placeholder="اكتب الدعاء هنا..."></textarea><button class="btn btn-primary" id="cd-s">حفظ</button>');
-  el.querySelector('#cd-s').onclick = () => {
-    const t = el.querySelector('#cd-t').value.trim(), x = el.querySelector('#cd-x').value.trim(); if (!x) return toast('اكتب نص الدعاء');
-    CUSTOM.push({ id: 'c' + Date.now(), icon: '', cat: 'أدعيتي', title: t || 'دعاء', text: x, src: 'من إضافتك', custom: true });
-    localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM)); el.remove(); duaCat = 'أدعيتي'; renderDuaaList(); toast('تم حفظ دعائك');
-  };
-}
-function delCustom(id) { if (!confirm('حذف هذا الدعاء؟')) return; CUSTOM = CUSTOM.filter(x => x.id !== id); localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM)); if (!CUSTOM.length) duaCat = 'الكل'; renderDuaaList(); }
-function speakDua(id) {
-  const d = allDuas().find(x => x.id === id); if (!d || !('speechSynthesis' in window)) return toast('جهازك لا يدعم القراءة الصوتية');
-  if (speechSynthesis.speaking) { speechSynthesis.cancel(); return; }
-  const u = new SpeechSynthesisUtterance(d.text.replace(/[ۖ-ۭ]/g, '')); u.lang = 'ar-SA'; u.rate = .82; speechSynthesis.speak(u);
-}
-async function shareDuaImage(id) {
-  const d = allDuas().find(x => x.id === id); if (!d) return; if (document.fonts) await document.fonts.ready;
-  const W = 1080, P = 110, dark = document.documentElement.classList.contains('dark');
-  const bg = dark ? '#16130f' : '#f3eee1', ink = dark ? '#e9e0c9' : '#1c1a15', br = dark ? '#cfa955' : '#9a7326', FT = '58px "Amiri Quran","Amiri",serif';
-  const m = document.createElement('canvas').getContext('2d'); m.font = FT; m.direction = 'rtl';
-  const lines = []; let cur = '';
-  d.text.split('\n').forEach(par => { cur = ''; par.split(' ').forEach(w => { const t = cur ? cur + ' ' + w : w; if (m.measureText(t).width > W - P * 2 && cur) { lines.push(cur); cur = w; } else cur = t; }); lines.push(cur); });
-  const LH = 108, H = Math.max(1350, 420 + lines.length * LH + 260), c = document.createElement('canvas'); c.width = W; c.height = H;
-  const x = c.getContext('2d'); x.direction = 'rtl'; x.textAlign = 'center';
-  x.fillStyle = bg; x.fillRect(0, 0, W, H); x.strokeStyle = br; x.lineWidth = 4; x.strokeRect(44, 44, W - 88, H - 88); x.lineWidth = 1.5; x.strokeRect(62, 62, W - 124, H - 124);
-  x.fillStyle = br; x.font = '700 70px "Amiri",serif'; x.fillText(d.title, W / 2, 190);
-  x.fillRect(W / 2 - 90, 232, 180, 2); x.font = FT; x.fillStyle = ink; lines.forEach((l, i) => x.fillText(l, W / 2, 360 + i * LH));
-  x.font = '34px "IBM Plex Sans Arabic",sans-serif'; x.fillStyle = br; if (d.src) x.fillText(d.src, W / 2, H - 190);
-  x.fillStyle = ink; x.globalAlpha = .6; x.fillText('أذكاري · qurandua.online', W / 2, H - 120);
-  c.toBlob(async b => { const f = new File([b], 'dua.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f] }); } catch (e) {} }
-    else { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'dua.png'; a.click(); } });
-}
-const EMO = /[\p{Extended_Pictographic}\uFE0F\u200D]/gu;
-function cleanIcons(root) {
-  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), L = []; let n;
-  while ((n = w.nextNode())) {
-    const p = n.parentElement; if (!p || p.closest('script,style,textarea,input,.chat-bubble,.duaa-text,.hero-moon,.nav-logo')) continue;
-    const t = n.nodeValue; EMO.lastIndex = 0; if (!EMO.test(t)) continue; EMO.lastIndex = 0;
-    const v = t.replace(EMO, '').replace(/^\s+/, ''); if (v.trim()) L.push([n, v]);
-  }
-  L.forEach(([n, v]) => { n.nodeValue = v; });
-}
-window.addEventListener('load', () => { cleanIcons(document.body); new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) cleanIcons(n); else if (n.nodeType === 3 && n.parentElement) cleanIcons(n.parentElement); }))).observe(document.body, { childList: true, subtree: true }); });
-Object.assign(window, { setTheme, markTheme, addCustomDua, delCustom, speakDua, shareDuaImage });
