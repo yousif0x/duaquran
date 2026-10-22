@@ -6,9 +6,9 @@
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#070816",
-  "theme_color": "#070816",
+  "orientation": "any",
+  "background_color": "#07101f",
+  "theme_color": "#0d2147",
   "dir": "rtl",
   "lang": "ar",
   "categories": [
@@ -81,5 +81,9 @@
         }
       ]
     }
+  ],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
   ]
 }

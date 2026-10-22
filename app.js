@@ -182,11 +182,11 @@ const AYAHS = [
 ];
 
 const AHADITHS = [
-  {t:'«مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ مِئَةَ مَرَّةٍ حُطَّتْ عَنْهُ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ»', s:'رواه البخاري ومسلم'},
+  {t:'«مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ مِئَةَ مَرَّةٍ حُطَّتْ عَنْهُ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ»', s:'حديث مأثور'},
   {t:'«مَنْ قَرَأَ آيَةَ الْكُرْسِيِّ فِي دُبُرِ كُلِّ صَلَاةٍ مَكْتُوبَةٍ لَمْ يَمْنَعْهُ مِنْ دُخُولِ الْجَنَّةِ إِلَّا أَنْ يَمُوتَ»', s:'رواه النسائي – صحيح'},
-  {t:'«كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ، حَبِيبَتَانِ إِلَى الرَّحْمَنِ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ»', s:'رواه البخاري ومسلم'},
+  {t:'«كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ، حَبِيبَتَانِ إِلَى الرَّحْمَنِ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ»', s:'حديث مأثور'},
   {t:'«طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ»', s:'رواه ابن ماجه – صحيح'},
-  {t:'«مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ»', s:'رواه مسلم'},
+  {t:'«مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ»', s:'حديث مأثور'},
   {t:'«الدُّعَاءُ مُخُّ الْعِبَادَةِ»', s:'رواه الترمذي'},
   {t:'«إِذَا أَرَادَ اللَّهُ بِعَبْدٍ خَيْرًا اسْتَعْمَلَهُ قَبْلَ مَوْتِهِ» قيل: وما استعمله؟ قال: «يُوَفِّقُهُ لِعَمَلٍ صَالِحٍ ثُمَّ يَقْبِضُهُ عَلَيْهِ»', s:'رواه الإمام أحمد'}
 ];
@@ -261,9 +261,9 @@ const SUWAR_LIST = [
 ];
 
 const CHECKLIST_ITEMS = [
-  {id:'ck-subhan',      l:'سبحان الله (33)',          i:'📿'},
-  {id:'ck-hamd',        l:'الحمد لله (33)',             i:'📿'},
   {id:'ck-akbar',       l:'الله أكبر (34)',             i:'📿'},
+  {id:'ck-hamd',        l:'الحمد لله (33)',             i:'📿'},
+  {id:'ck-subhan',      l:'سبحان الله (33)',          i:'📿'},
   {id:'ck-ayah-kursi',  l:'آية الكرسي بعد الصلاة',     i:'🌟'},
   {id:'ck-khatmah',     l:'جزء الختمة اليومية',         i:'📖'},
   {id:'ck-morning',     l:'أذكار الصباح',               i:'🌅'},
@@ -1074,7 +1074,7 @@ function loadPrayerTimes() {
       try {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-        const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=4`);
+        const res = await fetch(`https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lng}&method=0`);
         const data = await res.json();
         if (data && data.data && data.data.timings) {
           const t = data.data.timings;
@@ -1235,8 +1235,8 @@ async function sendNotif(title, body) {
 }
 
 // TASBIH MODAL
-let tasbihWord = 'سُبْحَانَ اللَّهِ';
-let tasbihMax = 33;
+let tasbihWord = 'اللَّهُ أَكْبَرُ';
+let tasbihMax = 34;
 let tasbihCount = 0;
 
 function openTasbih() {
@@ -1627,20 +1627,20 @@ const DUAS_PLUS = [
  {id:'q7',icon:'📖',cat:'أدعية قرآنية',title:'دعاء الفقر إلى الله',src:'القصص: ٢٤',text:'رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ'},
  {id:'q8',icon:'📖',cat:'أدعية قرآنية',title:'قرة العين والذرية',src:'الفرقان: ٧٤',text:'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا'},
  {id:'p1',icon:'👨‍👩‍👧',cat:'الوالدين والأهل',title:'الدعاء للوالدين',src:'الإسراء: ٢٤ · إبراهيم: ٤١',text:'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا\nرَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ'},
- {id:'p2',icon:'🕌',cat:'الصلاة والمسجد',title:'دعاء دخول المسجد',src:'رواه مسلم',text:'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ'},
- {id:'p3',icon:'🕌',cat:'الصلاة والمسجد',title:'دعاء الخروج من المسجد',src:'رواه مسلم',text:'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ'},
- {id:'p4',icon:'🚪',cat:'اليوم والليلة',title:'دعاء الخروج من المنزل',src:'أبو داود والترمذي',text:'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'},
- {id:'p5',icon:'🏠',cat:'اليوم والليلة',title:'دعاء دخول المنزل',src:'أبو داود',text:'بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا'},
- {id:'p6',icon:'🍽️',cat:'اليوم والليلة',title:'دعاء بعد الطعام',src:'أبو داود والترمذي',text:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ'},
- {id:'p7',icon:'🌧️',cat:'اليوم والليلة',title:'دعاء نزول المطر',src:'رواه البخاري',text:'اللَّهُمَّ صَيِّبًا نَافِعًا'},
+ {id:'p2',icon:'🕌',cat:'الصلاة والمسجد',title:'دعاء دخول المسجد',src:'من مأثور الأدعية',text:'بِسْمِ اللَّهِ وَبِاللَّهِ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ وَافْتَحْ لِي أَبْوَابَ رَحْمَتِكَ'},
+ {id:'p3',icon:'🕌',cat:'الصلاة والمسجد',title:'دعاء الخروج من المسجد',src:'من مأثور الأدعية',text:'بِسْمِ اللَّهِ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ وَافْتَحْ لِي أَبْوَابَ فَضْلِكَ'},
+ {id:'p4',icon:'🚪',cat:'اليوم والليلة',title:'دعاء الخروج من المنزل',src:'من مأثور الأدعية',text:'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'},
+ {id:'p5',icon:'🏠',cat:'اليوم والليلة',title:'دعاء دخول المنزل',src:'من مأثور الأدعية',text:'بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا'},
+ {id:'p6',icon:'🍽️',cat:'اليوم والليلة',title:'دعاء بعد الطعام',src:'من مأثور الأدعية',text:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ'},
+ {id:'p7',icon:'🌧️',cat:'اليوم والليلة',title:'دعاء نزول المطر',src:'من مأثور الأدعية',text:'اللَّهُمَّ صَيِّبًا نَافِعًا'},
  {id:'p8',icon:'✈️',cat:'السفر',title:'دعاء الركوب والسفر',src:'الزخرف: ١٣-١٤',text:'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ ﴿١٣﴾ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ ﴿١٤﴾'},
- {id:'s1',icon:'💚',cat:'الشفاء والفرج',title:'دعاء الشفاء للمريض',src:'رواه البخاري',text:'أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا'},
- {id:'s2',icon:'🌤️',cat:'الشفاء والفرج',title:'دعاء الكرب',src:'رواه البخاري ومسلم',text:'لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ'},
- {id:'s3',icon:'🌤️',cat:'الشفاء والفرج',title:'الاستعاذة من الهم والحزن',src:'رواه البخاري',text:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ'},
- {id:'r1',icon:'💰',cat:'الرزق والسعة',title:'الكفاية بالحلال',src:'رواه الترمذي',text:'اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ'},
- {id:'t1',icon:'🤍',cat:'التوبة والعفو',title:'دعاء ليلة القدر',src:'رواه الترمذي',text:'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي'},
- {id:'t2',icon:'🤍',cat:'التوبة والعفو',title:'العفو والعافية',src:'رواه أحمد والترمذي',text:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ'},
- {id:'t3',icon:'🤍',cat:'التوبة والعفو',title:'الثبات على الدين',src:'رواه الترمذي',text:'يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ'},
+ {id:'s1',icon:'💚',cat:'الشفاء والفرج',title:'دعاء الشفاء للمريض',src:'من مأثور الأدعية',text:'أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا'},
+ {id:'s2',icon:'🌤️',cat:'الشفاء والفرج',title:'دعاء الكرب',src:'من مأثور الأدعية',text:'لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ'},
+ {id:'s3',icon:'🌤️',cat:'الشفاء والفرج',title:'الاستعاذة من الهم والحزن',src:'من مأثور الأدعية',text:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ'},
+ {id:'r1',icon:'💰',cat:'الرزق والسعة',title:'الكفاية بالحلال',src:'من مأثور الأدعية',text:'اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ'},
+ {id:'t1',icon:'🤍',cat:'التوبة والعفو',title:'دعاء ليلة القدر',src:'من مأثور الأدعية',text:'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي'},
+ {id:'t2',icon:'🤍',cat:'التوبة والعفو',title:'العفو والعافية',src:'من مأثور الأدعية',text:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ'},
+ {id:'t3',icon:'🤍',cat:'التوبة والعفو',title:'الثبات على الدين',src:'من مأثور الأدعية',text:'يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ'},
  {id:'a1',icon:'🌹',cat:'أهل البيت (ع)',title:'تسبيح الزهراء (ع)',src:'بعد كل صلاة',text:'اللَّهُ أَكْبَرُ (٣٤ مرة)\nالْحَمْدُ لِلَّهِ (٣٣ مرة)\nسُبْحَانَ اللَّهِ (٣٣ مرة)'},
  {id:'a2',icon:'🌹',cat:'أهل البيت (ع)',title:'الصلاة على محمد وآل محمد',src:'ذكر مستحب',text:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ وَعَجِّلْ فَرَجَهُمْ'},
  {id:'a3',icon:'🌅',cat:'أهل البيت (ع)',title:'دعاء الحجة (عج) – اللهم كن لوليك',src:'دعاء مأثور للإمام المهدي (عج)',text:'اللَّهُمَّ كُنْ لِوَلِيِّكَ الْحُجَّةِ بْنِ الْحَسَنِ، صَلَوَاتُكَ عَلَيْهِ وَعَلَى آبَائِهِ، فِي هَذِهِ السَّاعَةِ وَفِي كُلِّ سَاعَةٍ، وَلِيًّا وَحَافِظًا وَقَائِدًا وَنَاصِرًا وَدَلِيلًا وَعَيْنًا، حَتَّى تُسْكِنَهُ أَرْضَكَ طَوْعًا وَتُمَتِّعَهُ فِيهَا طَوِيلًا'}
@@ -1655,23 +1655,23 @@ function toggleFav(id) {
   renderDuaaList();
 }
 function shareDua(id) {
-  const d = [...DUAAS, ...DUAS_PLUS].find(x => x.id === id); if (!d) return;
+  const d = allDuas().find(x => x.id === id); if (!d) return;
   const t = d.title + '\n\n' + d.text + '\n\n— تطبيق أذكاري';
   if (navigator.share) navigator.share({ text: t }).catch(() => {}); else fbCopy(t);
 }
 function setDuaCat(c) { duaCat = c; duaOnly = ''; renderDuaaList(); }
-function randomDua() { const l = [...DUAAS, ...DUAS_PLUS]; duaOnly = l[Math.floor(Math.random() * l.length)].id; duaCat = 'الكل'; duaQ = ''; renderDuaaList(); const c = document.getElementById('duaa-list'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+function randomDua() { const l = allDuas(); duaOnly = l[Math.floor(Math.random() * l.length)].id; duaCat = 'الكل'; duaQ = ''; renderDuaaList(); const c = document.getElementById('duaa-list'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 function setDuaQ(v) { duaQ = v; renderDuaaList(true); }
 
 function renderDuaaList(keepFocus) {
   const c = document.getElementById('duaa-list'); if (!c) return;
-  const all = [...DUAAS, ...DUAS_PLUS];
+  const all = allDuas();
   let tools = document.getElementById('duaa-tools');
   if (!tools) { tools = document.createElement('div'); tools.id = 'duaa-tools'; c.parentNode.insertBefore(tools, c); }
   const cats = ['الكل', '⭐ المفضلة', ...new Set(all.map(d => d.cat))];
   if (!keepFocus) {
-    tools.innerHTML = `<input class="dua-search" type="search" placeholder="🔍 ابحث في ${all.length} دعاء..." oninput="setDuaQ(this.value)" value="${escapeHtml(duaQ)}">
-      <div class="dua-chips"><button class="dua-chip ${duaOnly ? 'on' : ''}" onclick="randomDua()">🎲 عشوائي</button>${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
+    tools.innerHTML = `<input class="dua-search" type="search" placeholder="ابحث في ${all.length} دعاء..." oninput="setDuaQ(this.value)" value="${escapeHtml(duaQ)}">
+      <div class="dua-chips"><button class="dua-chip ${duaOnly ? 'on' : ''}" onclick="randomDua()">دعاء عشوائي</button><button class="dua-chip" onclick="addCustomDua()">+ أضف دعاءك</button>${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
   }
   const q = normAr(duaQ);
   const list = all.filter(d => (!duaOnly || d.id === duaOnly) && (duaCat === 'الكل' || (duaCat === '⭐ المفضلة' ? FAVS.includes(d.id) : d.cat === duaCat)) &&
@@ -1685,7 +1685,9 @@ function renderDuaaList(keepFocus) {
       <div class="duaa-text">${d.text.replace(/\n/g, '<br>')}</div>
       <div class="card-actions">
         <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
-        <button class="btn btn-ghost" onclick="shareDua('${d.id}')">📤 مشاركة</button>
+        <button class="btn btn-ghost" onclick="shareDua('${d.id}')">مشاركة</button>
+        <button class="btn btn-ghost" onclick="speakDua('${d.id}')">استماع</button>
+        <button class="btn btn-ghost" onclick="shareDuaImage('${d.id}')">صورة</button>${d.custom ? `<button class="btn btn-ghost" onclick="delCustom('${d.id}')">حذف</button>` : ''}
         <button class="btn btn-ghost ${fav ? 'fav' : ''}" onclick="toggleFav('${d.id}')">${fav ? '⭐' : '☆'}</button>
         <button class="btn btn-primary ${done ? 'done' : ''}" onclick="markRead(this,'duaa-${d.id}','${getCkKey(d.id)}')">✅ تمت القراءة</button>
       </div>`;
@@ -1788,22 +1790,22 @@ Object.assign(window, { enablePush, syncPush, showInstallHint });
 })();
 
 // ═══ ميزات نُور: الإعدادات + ألوان + نسخ احتياطي + مشاركة ═══
-const ACCENTS = { nur: ['نُور', '#8b5cf6,#22d3ee'], emerald: ['زمرّد', '#059669,#facc15'], ruby: ['ياقوت', '#e11d48,#f59e0b'], sand: ['رمل', '#f59e0b,#16a34a'] };
+const ACCENTS = { ink: ['لازوردي', '#1d4f9c'], olive: ['زمردي', '#0f7a5c'], wine: ['ياقوتي', '#a3243b'], slate: ['عنبري', '#8a5a14'] };
 const SITE_URL = 'https://qurandua.online/';
 function setAccent(k) {
   document.documentElement.dataset.accent = k;
   try { localStorage.setItem('nur_accent', k); } catch (e) {}
   document.querySelectorAll('.nur-sw').forEach(b => b.classList.toggle('on', b.dataset.k === k));
 }
-setAccent((function () { try { return localStorage.getItem('nur_accent') || 'nur'; } catch (e) { return 'nur'; } })());
+setAccent((function () { try { return localStorage.getItem('nur_accent') || 'ink'; } catch (e) { return 'ink'; } })());
 function openSettings() {
   if (document.getElementById('nur-set')) return;
   const cur = document.documentElement.dataset.accent;
   const el = document.createElement('div'); el.id = 'nur-set'; el.className = 'nur-ov';
   el.onclick = e => { if (e.target === el) el.remove(); };
   el.innerHTML = `<div class="nur-sheet"><h3>⚙️ الإعدادات</h3>
-    <div class="nur-sec">🎨 لون التطبيق</div>
-    <div class="nur-acc">${Object.entries(ACCENTS).map(([k, v]) => `<button class="nur-sw ${k === cur ? 'on' : ''}" data-k="${k}" title="${v[0]}" style="background:linear-gradient(135deg,${v[1]})" onclick="setAccent('${k}')">${v[0]}</button>`).join('')}</div>
+    <div class="nur-sec">المظهر</div><div class="nur-row">${[['light','فاتح'],['dark','ليلي مريح'],['auto','تلقائي']].map(([k,t])=>`<button class="btn btn-ghost nur-th" data-m="${k}" onclick="setTheme('${k}')">${t}</button>`).join('')}</div><div class="nur-sec">لون التطبيق</div>
+    <div class="nur-acc">${Object.entries(ACCENTS).map(([k, v]) => `<button class="nur-sw ${k === cur ? 'on' : ''}" data-k="${k}" title="${v[0]}" style="background:${v[1]}" onclick="setAccent('${k}')">${v[0]}</button>`).join('')}</div>
     <div class="nur-sec">🔔 الإشعارات</div>
     <div class="nur-row"><button class="btn btn-primary" onclick="enablePush().then(ok=>ok&&toast('✅ تم تفعيل الإشعارات'))">تفعيل الإشعارات</button><button class="btn btn-ghost" onclick="document.getElementById('nur-set').remove();openReminder()">⏰ المواعيد</button></div>
     <div class="nur-sec">💾 بياناتي</div>
@@ -1811,8 +1813,8 @@ function openSettings() {
     <div class="nur-sec">📲 التطبيق</div>
     <button class="btn btn-ghost" onclick="shareApp()">مشاركة أذكاري مع أحبّتك</button>
     <button class="btn btn-ghost nur-danger" onclick="resetAll()">🗑️ مسح كل البيانات</button>
-    <p class="nur-foot">أذكاري · qurandua.online</p></div>`;
-  document.body.appendChild(el);
+    <p class="nur-foot">أوقات الصلاة بالطريقة الجعفرية (معهد ليوا – قم)<br>أذكاري · qurandua.online</p></div>`;
+  document.body.appendChild(el); markTheme();
 }
 function exportData() {
   const o = { app: 'adhkari', at: new Date().toISOString(), S: JSON.parse(localStorage.getItem('adhkar_v5') || '{}'), favs: FAVS, accent: document.documentElement.dataset.accent };
@@ -1835,6 +1837,101 @@ function resetAll() { if (confirm('سيتم مسح كل تقدمك وإعداد�
 window.addEventListener('DOMContentLoaded', () => {
   const nr = document.querySelector('.nav-right'); if (!nr) return;
   const ai = nr.querySelector('[onclick="go(\'ai\')"]'); if (ai) ai.remove();
-  const b = document.createElement('button'); b.className = 'nav-btn'; b.title = 'الإعدادات'; b.textContent = '⚙️'; b.onclick = openSettings; nr.appendChild(b);
+  const b = document.createElement('button'); b.className = 'nav-btn'; b.title = 'الإعدادات'; b.setAttribute('onclick', 'openSettings()'); nr.appendChild(b);
 });
 Object.assign(window, { openSettings, setAccent, exportData, importData, shareApp, resetAll, randomDua });
+
+// ═══ مِداد: مظهر تلقائي + أدعيتي + استماع + مشاركة كصورة + تنظيف الأيقونات ═══
+let CUSTOM = []; try { CUSTOM = JSON.parse(localStorage.getItem('adhkari_custom') || '[]'); } catch (e) {}
+function allDuas() { return [...DUAAS, ...DUAS_PLUS, ...CUSTOM]; }
+const sysDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
+function applyTheme() {
+  const m = localStorage.getItem('nur_theme') || 'auto';
+  S.darkMode = m === 'auto' ? sysDark() : m === 'dark'; applyDark();
+  const t = document.querySelector('meta[name=theme-color]'); if (t) t.content = S.darkMode ? '#050d1d' : '#0d2147';
+}
+function markTheme() { const m = localStorage.getItem('nur_theme') || 'auto'; document.querySelectorAll('.nur-th').forEach(b => b.classList.toggle('on', b.dataset.m === m)); }
+function setTheme(m) { try { localStorage.setItem('nur_theme', m); } catch (e) {} applyTheme(); markTheme(); }
+window.toggleDark = () => setTheme(S.darkMode ? 'light' : 'dark');
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if ((localStorage.getItem('nur_theme') || 'auto') === 'auto') applyTheme(); });
+window.addEventListener('DOMContentLoaded', () => setTimeout(applyTheme, 0));
+function sheet(html) {
+  const el = document.createElement('div'); el.className = 'nur-ov'; el.onclick = e => { if (e.target === el) el.remove(); };
+  el.innerHTML = '<div class="nur-sheet">' + html + '</div>'; document.body.appendChild(el); return el;
+}
+function addCustomDua() {
+  const el = sheet('<h3>أضف دعاءك</h3><input id="cd-t" placeholder="العنوان (مثال: دعائي للتوفيق)"><textarea id="cd-x" placeholder="اكتب الدعاء هنا..."></textarea><button class="btn btn-primary" id="cd-s">حفظ</button>');
+  el.querySelector('#cd-s').onclick = () => {
+    const t = el.querySelector('#cd-t').value.trim(), x = el.querySelector('#cd-x').value.trim(); if (!x) return toast('اكتب نص الدعاء');
+    CUSTOM.push({ id: 'c' + Date.now(), icon: '', cat: 'أدعيتي', title: t || 'دعاء', text: x, src: 'من إضافتك', custom: true });
+    localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM)); el.remove(); duaCat = 'أدعيتي'; renderDuaaList(); toast('تم حفظ دعائك');
+  };
+}
+function delCustom(id) { if (!confirm('حذف هذا الدعاء؟')) return; CUSTOM = CUSTOM.filter(x => x.id !== id); localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM)); if (!CUSTOM.length) duaCat = 'الكل'; renderDuaaList(); }
+function speakDua(id) {
+  const d = allDuas().find(x => x.id === id); if (!d || !('speechSynthesis' in window)) return toast('جهازك لا يدعم القراءة الصوتية');
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); return; }
+  const u = new SpeechSynthesisUtterance(d.text.replace(/[ۖ-ۭ]/g, '')); u.lang = 'ar-SA'; u.rate = .82; speechSynthesis.speak(u);
+}
+async function shareDuaImage(id) {
+  const d = allDuas().find(x => x.id === id); if (!d) return; if (document.fonts) await document.fonts.ready;
+  const W = 1080, P = 110, dark = document.documentElement.classList.contains('dark');
+  const bg = dark ? '#07101f' : '#f7f0dc', ink = dark ? '#e9e0c9' : '#1c1a15', br = dark ? '#cfa955' : '#9a7326', FT = '58px "Amiri Quran","Amiri",serif';
+  const m = document.createElement('canvas').getContext('2d'); m.font = FT; m.direction = 'rtl';
+  const lines = []; let cur = '';
+  d.text.split('\n').forEach(par => { cur = ''; par.split(' ').forEach(w => { const t = cur ? cur + ' ' + w : w; if (m.measureText(t).width > W - P * 2 && cur) { lines.push(cur); cur = w; } else cur = t; }); lines.push(cur); });
+  const LH = 108, H = Math.max(1350, 420 + lines.length * LH + 260), c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); x.direction = 'rtl'; x.textAlign = 'center';
+  x.fillStyle = bg; x.fillRect(0, 0, W, H); x.strokeStyle = br; x.lineWidth = 4; x.strokeRect(44, 44, W - 88, H - 88); x.lineWidth = 1.5; x.strokeRect(62, 62, W - 124, H - 124);
+  x.fillStyle = br; x.font = '700 70px "Amiri",serif'; x.fillText(d.title, W / 2, 190);
+  x.fillRect(W / 2 - 90, 232, 180, 2); x.font = FT; x.fillStyle = ink; lines.forEach((l, i) => x.fillText(l, W / 2, 360 + i * LH));
+  x.font = '34px "IBM Plex Sans Arabic",sans-serif'; x.fillStyle = br; if (d.src) x.fillText(d.src, W / 2, H - 190);
+  x.fillStyle = ink; x.globalAlpha = .6; x.fillText('أذكاري · qurandua.online', W / 2, H - 120);
+  c.toBlob(async b => { const f = new File([b], 'dua.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f] }); } catch (e) {} }
+    else { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'dua.png'; a.click(); } });
+}
+const EMO = /[\p{Extended_Pictographic}\uFE0F\u200D]/gu;
+function cleanIcons(root) {
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), L = []; let n;
+  while ((n = w.nextNode())) {
+    const p = n.parentElement; if (!p || p.closest('script,style,textarea,input,.chat-bubble,.duaa-text,.hero-moon,.nav-logo')) continue;
+    const t = n.nodeValue; EMO.lastIndex = 0; if (!EMO.test(t)) continue; EMO.lastIndex = 0;
+    const v = t.replace(EMO, '').replace(/^\s+/, ''); if (v.trim()) L.push([n, v]);
+  }
+  L.forEach(([n, v]) => { n.nodeValue = v; });
+}
+window.addEventListener('load', () => { cleanIcons(document.body); new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) cleanIcons(n); else if (n.nodeType === 3 && n.parentElement) cleanIcons(n.parentElement); }))).observe(document.body, { childList: true, subtree: true }); });
+Object.assign(window, { setTheme, markTheme, addCustomDua, delCustom, speakDua, shareDuaImage });
+
+// ═══ حارس التباين: لا يختفي أي نص في أي وضع ═══
+(function () {
+  const P = s => { const m = s.match(/[\d.]+/g); return m ? m.map(Number) : [0, 0, 0, 1]; };
+  const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }, lum = c => .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]);
+  const bgOf = e => { for (let n = e; n && n.nodeType === 1; n = n.parentElement) { const s = getComputedStyle(n), c = P(s.backgroundColor), al = c.length < 4 ? 1 : c[3]; if (s.backgroundImage !== 'none' && al < .95) return null; if (al >= .95) return c; } return [255, 255, 255]; };
+  let t;
+  function guard() {
+    document.querySelectorAll('[data-cg]').forEach(e => { e.style.removeProperty('color'); e.removeAttribute('data-cg'); });
+    document.querySelectorAll('.tab-content.active *,.overlay:not(.hidden) *,.tasbih-overlay:not(.hidden) *,.nur-ov *,.navbar *,.prayer-bar *').forEach(e => {
+      if (e.closest('.ti,.nav-btn') || ![...e.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim())) return;
+      const s = getComputedStyle(e); if (s.visibility === 'hidden' || s.display === 'none') return;
+      const bg = bgOf(e); if (!bg) return; const fg = P(s.color), a = fg.length < 4 ? 1 : fg[3];
+      const L1 = lum(fg), L2 = lum(bg), cr = (Math.max(L1, L2) + .05) / (Math.min(L1, L2) + .05);
+      if (cr < 2.6 || a < .4) { e.style.setProperty('color', L2 > .4 ? '#13264a' : '#f6efdc', 'important'); e.setAttribute('data-cg', '1'); }
+    });
+  }
+  const run = () => { clearTimeout(t); t = setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(guard) : guard()), 350); };
+  window.addEventListener('load', run);
+  new MutationObserver(run).observe(document.body, { attributes: true, subtree: true, childList: true, attributeFilter: ['class'] });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', run); window.runGuard = run;
+})();
+
+// ═══ غلاف التطبيق: يثبت على قياس الشاشة ويتأقلم مع أي حجم ═══
+(function () {
+  const de = document.documentElement, vv = window.visualViewport;
+  const fit = () => de.style.setProperty('--app-h', (vv ? vv.height : innerHeight) + 'px');
+  fit(); addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 250)); if (vv) vv.addEventListener('resize', fit);
+  if (IS_STANDALONE) de.classList.add('standalone');
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  const _g = window.go; window.go = function (t) { _g(t); const m = document.querySelector('.main'); if (m) m.scrollTo({ top: 0 }); };
+})();
