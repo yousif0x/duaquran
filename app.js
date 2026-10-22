@@ -1935,3 +1935,37 @@ Object.assign(window, { setTheme, markTheme, addCustomDua, delCustom, speakDua, 
   document.addEventListener('gesturestart', e => e.preventDefault());
   const _g = window.go; window.go = function (t) { _g(t); const m = document.querySelector('.main'); if (m) m.scrollTo({ top: 0 }); };
 })();
+
+// ═══ مميزات بصرية: فوانيس + سماء حية بعدّاد الصلاة + شرارات ═══
+(function () {
+  const hero = document.querySelector('.hero');
+  if (hero) [[7, 70, 0], [27, 120, -1.6], [73, 95, -.8], [93, 150, -2.4]].forEach(([x, len, dl]) => {
+    const f = document.createElement('div'); f.className = 'fan'; f.style.cssText = `left:${x}%;--len:${len}px;--d:${dl}s`; f.innerHTML = '<i></i>'; hero.appendChild(f);
+  });
+  const tab = document.getElementById('tab-salah');
+  if (tab && !document.getElementById('nur-sky')) {
+    const el = document.createElement('div'); el.id = 'nur-sky'; el.className = 'nur-sky p-night';
+    el.innerHTML = '<div class="orb moon" id="sk-orb"></div><div class="sk-body"><div class="sk-lbl">الصلاة القادمة</div><div class="sk-name" id="sk-name">...</div><div class="sk-time" id="sk-cd">--:--:--</div><div class="sk-at" id="sk-at"></div></div><svg class="sk-ring" viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" id="sk-prog" cx="50" cy="50" r="44"/></svg>';
+    tab.insertBefore(el, tab.firstChild);
+  }
+  const NM = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'], KEY = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+  function skyTick() {
+    const el = document.getElementById('nur-sky'); if (!el || typeof prayerTimes === 'undefined' || !prayerTimes) return;
+    const pt = {}; Object.entries(prayerTimes).forEach(([k, v]) => { if (typeof v === 'string') pt[k.toLowerCase()] = v.slice(0, 5); });
+    if (!KEY.every(k => pt[k])) return;
+    const T = KEY.map(k => { const [h, m] = pt[k].split(':'); return +h * 60 + +m; }), n = new Date(), nm = n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
+    const i = T.findIndex(t => t > nm), ni = i < 0 ? 0 : i, nT = i < 0 ? T[0] + 1440 : T[i], pT = i < 0 ? T[4] : (i === 0 ? T[4] - 1440 : T[i - 1]);
+    const rem = Math.max(0, Math.round((nT - nm) * 60)), f2 = x => String(x).padStart(2, '0');
+    document.getElementById('sk-name').textContent = NM[ni]; document.getElementById('sk-at').textContent = 'الأذان ' + pt[KEY[ni]];
+    document.getElementById('sk-cd').textContent = f2(Math.floor(rem / 3600)) + ':' + f2(Math.floor(rem % 3600 / 60)) + ':' + f2(rem % 60);
+    document.getElementById('sk-prog').style.strokeDashoffset = 276.46 * (1 - Math.min(1, Math.max(0, (nm - pT) / (nT - pT))));
+    el.className = 'nur-sky ' + (i < 0 || i === 0 ? 'p-night' : ['', 'p-morning', 'p-day', 'p-golden', 'p-sunset'][i]);
+    const sun = nm >= T[0] && nm < T[3], fr = sun ? (nm - T[0]) / (T[3] - T[0]) : ((nm < T[0] ? nm + 1440 : nm) - T[3]) / (T[0] + 1440 - T[3]);
+    const o = document.getElementById('sk-orb'); o.className = 'orb ' + (sun ? 'sun' : 'moon'); o.style.left = (8 + 76 * fr) + '%'; o.style.top = (58 - 46 * Math.sin(Math.PI * fr)) + '%';
+  }
+  setInterval(skyTick, 1000); setTimeout(skyTick, 1500);
+  document.addEventListener('pointerdown', e => {
+    const b = e.target.closest('.dhikr-tap,.tasbih-tap-btn'); if (!b) return; const r = b.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    for (let k = 0; k < 10; k++) { const s = document.createElement('i'), an = Math.random() * 6.28, di = 40 + Math.random() * 70; s.className = 'spark'; s.style.cssText = `left:${cx}px;top:${cy}px;--dx:${Math.cos(an) * di}px;--dy:${Math.sin(an) * di}px`; document.body.appendChild(s); setTimeout(() => s.remove(), 700); }
+  });
+})();

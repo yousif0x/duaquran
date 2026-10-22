@@ -3,7 +3,7 @@
    ══════════════════════════════════════════════════════ */
 'use strict';
 
-const CACHE = 'adhkar-v16';
+const CACHE = 'adhkar-v17';
 const ASSETS = ['./', './index.html', './style.css', './andalus.css', './config.js', './icon-192.png', './app.js', './manifest.json'];
 
 /* ── إشعارات مجدولة (الأوقات) ── */
@@ -45,14 +45,19 @@ self.addEventListener('fetch', e => {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      if (!res || res.status !== 200 || res.type === 'opaque') return res;
-      const clone = res.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
+  const same = new URL(e.request.url).origin === self.location.origin;
+  if (e.request.method !== 'GET') return;
+  if (same) {   // ملفات التطبيق: الشبكة أولاً (حتى يصلك كل تحديث فوراً) ثم الكاش عند انقطاع النت
+    e.respondWith(fetch(e.request).then(res => {
+      if (res && res.status === 200) { const c = res.clone(); caches.open(CACHE).then(x => x.put(e.request, c)); }
       return res;
-    }))
-  );
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('./index.html'))));
+    return;
+  }
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+    if (!res || res.status !== 200) return res;
+    const c = res.clone(); caches.open(CACHE).then(x => x.put(e.request, c)); return res;
+  })));
 });
 
 /* ── Push من سيرفر خارجي ── */

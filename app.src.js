@@ -474,7 +474,7 @@ function getCkKey(id) {
   return '';
 }
 
-function renderDuaaList() {
+function renderDuaaListLegacy() {
   const c = document.getElementById('duaa-list');
   if (!c) return;
   c.innerHTML = '';
@@ -1617,8 +1617,86 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// ═══ DUAS LIBRARY PLUS: بحث + تصنيفات + مفضلة + مشاركة ═══
+const DUAS_PLUS = [
+ {id:'q1',icon:'📖',cat:'أدعية قرآنية',title:'حسنة الدنيا والآخرة',src:'البقرة: ٢٠١',text:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ'},
+ {id:'q2',icon:'📖',cat:'أدعية قرآنية',title:'خواتيم البقرة',src:'البقرة: ٢٨٦',text:'رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا أَنتَ مَوْلَانَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ'},
+ {id:'q3',icon:'📖',cat:'أدعية قرآنية',title:'الثبات على الهداية',src:'آل عمران: ٨',text:'رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ'},
+ {id:'q4',icon:'📖',cat:'أدعية قرآنية',title:'دعاء التوكل',src:'التوبة: ١٢٩',text:'حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ ۖ عَلَيْهِ تَوَكَّلْتُ ۖ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ'},
+ {id:'q5',icon:'📖',cat:'أدعية قرآنية',title:'دعاء ذي النون (الكرب)',src:'الأنبياء: ٨٧',text:'لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ'},
+ {id:'q6',icon:'📖',cat:'أدعية قرآنية',title:'شرح الصدر وتيسير الأمر',src:'طه: ٢٥-٢٨',text:'رَبِّ اشْرَحْ لِي صَدْرِي ﴿٢٥﴾ وَيَسِّرْ لِي أَمْرِي ﴿٢٦﴾ وَاحْلُلْ عُقْدَةً مِّن لِّسَانِي ﴿٢٧﴾ يَفْقَهُوا قَوْلِي ﴿٢٨﴾'},
+ {id:'q7',icon:'📖',cat:'أدعية قرآنية',title:'دعاء الفقر إلى الله',src:'القصص: ٢٤',text:'رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ'},
+ {id:'q8',icon:'📖',cat:'أدعية قرآنية',title:'قرة العين والذرية',src:'الفرقان: ٧٤',text:'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا'},
+ {id:'p1',icon:'👨‍👩‍👧',cat:'الوالدين والأهل',title:'الدعاء للوالدين',src:'الإسراء: ٢٤ · إبراهيم: ٤١',text:'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا\nرَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ'},
+ {id:'p2',icon:'🕌',cat:'الصلاة والمسجد',title:'دعاء دخول المسجد',src:'رواه مسلم',text:'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ'},
+ {id:'p3',icon:'🕌',cat:'الصلاة والمسجد',title:'دعاء الخروج من المسجد',src:'رواه مسلم',text:'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ'},
+ {id:'p4',icon:'🚪',cat:'اليوم والليلة',title:'دعاء الخروج من المنزل',src:'أبو داود والترمذي',text:'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'},
+ {id:'p5',icon:'🏠',cat:'اليوم والليلة',title:'دعاء دخول المنزل',src:'أبو داود',text:'بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا'},
+ {id:'p6',icon:'🍽️',cat:'اليوم والليلة',title:'دعاء بعد الطعام',src:'أبو داود والترمذي',text:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ'},
+ {id:'p7',icon:'🌧️',cat:'اليوم والليلة',title:'دعاء نزول المطر',src:'رواه البخاري',text:'اللَّهُمَّ صَيِّبًا نَافِعًا'},
+ {id:'p8',icon:'✈️',cat:'السفر',title:'دعاء الركوب والسفر',src:'الزخرف: ١٣-١٤',text:'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ ﴿١٣﴾ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ ﴿١٤﴾'},
+ {id:'s1',icon:'💚',cat:'الشفاء والفرج',title:'دعاء الشفاء للمريض',src:'رواه البخاري',text:'أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا'},
+ {id:'s2',icon:'🌤️',cat:'الشفاء والفرج',title:'دعاء الكرب',src:'رواه البخاري ومسلم',text:'لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ'},
+ {id:'s3',icon:'🌤️',cat:'الشفاء والفرج',title:'الاستعاذة من الهم والحزن',src:'رواه البخاري',text:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ'},
+ {id:'r1',icon:'💰',cat:'الرزق والسعة',title:'الكفاية بالحلال',src:'رواه الترمذي',text:'اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ'},
+ {id:'t1',icon:'🤍',cat:'التوبة والعفو',title:'دعاء ليلة القدر',src:'رواه الترمذي',text:'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي'},
+ {id:'t2',icon:'🤍',cat:'التوبة والعفو',title:'العفو والعافية',src:'رواه أحمد والترمذي',text:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ'},
+ {id:'t3',icon:'🤍',cat:'التوبة والعفو',title:'الثبات على الدين',src:'رواه الترمذي',text:'يَا مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ'},
+ {id:'a1',icon:'🌹',cat:'أهل البيت (ع)',title:'تسبيح الزهراء (ع)',src:'بعد كل صلاة',text:'اللَّهُ أَكْبَرُ (٣٤ مرة)\nالْحَمْدُ لِلَّهِ (٣٣ مرة)\nسُبْحَانَ اللَّهِ (٣٣ مرة)'},
+ {id:'a2',icon:'🌹',cat:'أهل البيت (ع)',title:'الصلاة على محمد وآل محمد',src:'ذكر مستحب',text:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَآلِ مُحَمَّدٍ وَعَجِّلْ فَرَجَهُمْ'},
+ {id:'a3',icon:'🌅',cat:'أهل البيت (ع)',title:'دعاء الحجة (عج) – اللهم كن لوليك',src:'دعاء مأثور للإمام المهدي (عج)',text:'اللَّهُمَّ كُنْ لِوَلِيِّكَ الْحُجَّةِ بْنِ الْحَسَنِ، صَلَوَاتُكَ عَلَيْهِ وَعَلَى آبَائِهِ، فِي هَذِهِ السَّاعَةِ وَفِي كُلِّ سَاعَةٍ، وَلِيًّا وَحَافِظًا وَقَائِدًا وَنَاصِرًا وَدَلِيلًا وَعَيْنًا، حَتَّى تُسْكِنَهُ أَرْضَكَ طَوْعًا وَتُمَتِّعَهُ فِيهَا طَوِيلًا'}
+];
+
+// ── المفضلة ──
+let FAVS = []; try { FAVS = JSON.parse(localStorage.getItem('adhkar_favs') || '[]'); } catch (e) {}
+let duaCat = 'الكل', duaQ = '';
+function toggleFav(id) {
+  FAVS = FAVS.includes(id) ? FAVS.filter(x => x !== id) : [...FAVS, id];
+  try { localStorage.setItem('adhkar_favs', JSON.stringify(FAVS)); } catch (e) {}
+  renderDuaaList();
+}
+function shareDua(id) {
+  const d = [...DUAAS, ...DUAS_PLUS].find(x => x.id === id); if (!d) return;
+  const t = d.title + '\n\n' + d.text + '\n\n— تطبيق أذكاري';
+  if (navigator.share) navigator.share({ text: t }).catch(() => {}); else fbCopy(t);
+}
+function setDuaCat(c) { duaCat = c; renderDuaaList(); }
+function setDuaQ(v) { duaQ = v; renderDuaaList(true); }
+
+function renderDuaaList(keepFocus) {
+  const c = document.getElementById('duaa-list'); if (!c) return;
+  const all = [...DUAAS, ...DUAS_PLUS];
+  let tools = document.getElementById('duaa-tools');
+  if (!tools) { tools = document.createElement('div'); tools.id = 'duaa-tools'; c.parentNode.insertBefore(tools, c); }
+  const cats = ['الكل', '⭐ المفضلة', ...new Set(all.map(d => d.cat))];
+  if (!keepFocus) {
+    tools.innerHTML = `<input class="dua-search" type="search" placeholder="🔍 ابحث في ${all.length} دعاء..." oninput="setDuaQ(this.value)" value="${escapeHtml(duaQ)}">
+      <div class="dua-chips">${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
+  }
+  const q = normAr(duaQ);
+  const list = all.filter(d => (duaCat === 'الكل' || (duaCat === '⭐ المفضلة' ? FAVS.includes(d.id) : d.cat === duaCat)) &&
+    (!q || normAr(d.title + ' ' + d.text + ' ' + d.cat).includes(q)));
+  c.innerHTML = list.length ? '' : '<div class="dua-empty">لا توجد نتائج 🌙</div>';
+  list.forEach(d => {
+    const done = !!S.done['duaa-' + d.id], fav = FAVS.includes(d.id);
+    const el = document.createElement('div'); el.className = 'duaa-card';
+    el.innerHTML = `<div class="duaa-category"><span>${d.icon}</span> ${d.cat}${d.src ? ` · <em>${d.src}</em>` : ''}</div>
+      <div class="duaa-title">${d.title}</div>
+      <div class="duaa-text">${d.text.replace(/\n/g, '<br>')}</div>
+      <div class="card-actions">
+        <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
+        <button class="btn btn-ghost" onclick="shareDua('${d.id}')">📤 مشاركة</button>
+        <button class="btn btn-ghost ${fav ? 'fav' : ''}" onclick="toggleFav('${d.id}')">${fav ? '⭐' : '☆'}</button>
+        <button class="btn btn-primary ${done ? 'done' : ''}" onclick="markRead(this,'duaa-${d.id}','${getCkKey(d.id)}')">✅ تمت القراءة</button>
+      </div>`;
+    c.appendChild(el);
+  });
+  if (keepFocus) { const i = tools.querySelector('.dua-search'); if (i && document.activeElement !== i) i.focus(); }
+}
+
 // GLOBAL EXPORTS FOR HTML ONCLICK HANDLERS
 Object.assign(window, {
+  toggleFav, shareDua, setDuaCat, setDuaQ, renderDuaaList,
   launchApp, renderCanvas, go, toggleDark, applyDark, chFont, applyFontScale,
   toggleAthan, updateAthanBtn, playAthan, pomoStart, pomoPause, pomoReset, tapDhikr, resetDhikr,
   markDhikrDone, tapWird, resetWird, tapLan, tapSalam, markRead, copyCard, fbCopy, toggleCL, updateTrackerUI,
