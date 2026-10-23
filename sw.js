@@ -1,25 +1,23 @@
-/* ══════════════════════════════════════════════════════
-   أذكاري v6 – Service Worker | إشعارات حقيقية خارج التطبيق
-   ══════════════════════════════════════════════════════ */
+
 'use strict';
 
 const CACHE = 'adhkar-v17';
-const ASSETS = ['./', './index.html', './style.css', './andalus.css', './config.js', './icon-192.png', './app.js', './manifest.json'];
+const ASSETS = ['./', './index.html', './style.css', './theme.css', './config.js', './icon-192.png', './app.js', './manifest.json'];
 
-/* ── إشعارات مجدولة (الأوقات) ── */
+/* إشعارات مجدولة (الأوقات) */
 const NOTIF_MESSAGES = {
-  morning: { title: 'أذكار الصباح 🌅', body: 'حان وقت أذكار الصباح، ابدأ يومك بذكر الله! ﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾' },
-  evening: { title: 'أذكار المساء 🌇', body: 'حان وقت أذكار المساء، حصّن نفسك بذكر الله!' },
-  ziyarat: { title: 'زيارة عاشوراء 🏴', body: 'حان وقت زيارة عاشوراء والأدعية المباركة.' },
-  sleep:   { title: 'أذكار النوم 🌙', body: 'حان وقت أذكار النوم وآية الكرسي، نوم هنيئاً بذكر الله.' },
-  fajr:    { title: 'تنبيه الفجر 🕌', body: 'صلاة الفجر قريبة، استعد للصلاة 🤲' },
-  dhuhr:   { title: 'تنبيه الظهر 🕌', body: 'صلاة الظهر قريبة، استعد للصلاة 🤲' },
-  asr:     { title: 'تنبيه العصر 🕌', body: 'صلاة العصر قريبة، استعد للصلاة 🤲' },
-  maghrib: { title: 'تنبيه المغرب 🕌', body: 'صلاة المغرب قريبة، استعد للصلاة 🤲' },
-  isha:    { title: 'تنبيه العشاء 🕌', body: 'صلاة العشاء قريبة، استعد للصلاة 🤲' },
+  morning: { title: 'أذكار الصباح', body: 'حان وقت أذكار الصباح، ابدأ يومك بذكر الله! ﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾' },
+  evening: { title: 'أذكار المساء', body: 'حان وقت أذكار المساء، حصّن نفسك بذكر الله!' },
+  ziyarat: { title: 'زيارة عاشوراء', body: 'حان وقت زيارة عاشوراء والأدعية المباركة.' },
+  sleep:   { title: 'أذكار النوم', body: 'حان وقت أذكار النوم وآية الكرسي، نوم هنيئاً بذكر الله.' },
+  fajr:    { title: 'تنبيه الفجر', body: 'صلاة الفجر قريبة، استعد للصلاة' },
+  dhuhr:   { title: 'تنبيه الظهر', body: 'صلاة الظهر قريبة، استعد للصلاة' },
+  asr:     { title: 'تنبيه العصر', body: 'صلاة العصر قريبة، استعد للصلاة' },
+  maghrib: { title: 'تنبيه المغرب', body: 'صلاة المغرب قريبة، استعد للصلاة' },
+  isha:    { title: 'تنبيه العشاء', body: 'صلاة العشاء قريبة، استعد للصلاة' },
 };
 
-/* ── تثبيت الـ Cache ── */
+/* تثبيت الـ Cache */
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
@@ -28,7 +26,7 @@ self.addEventListener('install', e => {
   );
 });
 
-/* ── تنشيط + حذف القديم ── */
+/* تنشيط + حذف القديم */
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
@@ -37,7 +35,7 @@ self.addEventListener('activate', e => {
   );
 });
 
-/* ── Fetch: Cache-first مع network fallback ── */
+/* Fetch: Cache-first مع network fallback */
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('api.alquran.cloud') ||
       e.request.url.includes('mp3quran') ||
@@ -60,20 +58,20 @@ self.addEventListener('fetch', e => {
   })));
 });
 
-/* ── Push من سيرفر خارجي ── */
+
 self.addEventListener('push', e => {
   let d = null; try { d = e.data && e.data.json(); } catch (_) {}
   e.waitUntil(d && d.title ? showAdhkarNotif(d.title, d.body, d.tag || 'push') : pushNotif());
 });
 
-/* ── Periodic Background Sync (Android Chrome) ── */
+/* Periodic Background Sync (Android Chrome) */
 self.addEventListener('periodicsync', e => {
   if (e.tag === 'adhkar-check') {
     e.waitUntil(checkAndSendScheduledNotifs());
   }
 });
 
-/* ── Message من الصفحة الرئيسية ── */
+/* Message من الصفحة الرئيسية */
 self.addEventListener('message', e => {
   if (e.data && e.data.type === 'SCHEDULE_NOTIFS') {
     // حفظ الجدول في IndexedDB أو استخدم الـ cache كـ storage
@@ -86,7 +84,7 @@ self.addEventListener('message', e => {
   }
 });
 
-/* ── فحص الأوقات وإرسال الإشعارات ── */
+/* فحص الأوقات وإرسال الإشعارات */
 async function checkAndSendScheduledNotifs() {
   try {
     const schedule = await getSchedule();
@@ -118,7 +116,7 @@ async function checkAndSendScheduledNotifs() {
       checks.push({
         key: 'custom_wird',
         time: schedule.wird.time,
-        custom: { title: `📿 وردك اليومي`, body: schedule.wird.text }
+        custom: { title: `وردك اليومي`, body: schedule.wird.text }
       });
     }
 
@@ -146,13 +144,13 @@ async function checkAndSendScheduledNotifs() {
   } catch (err) {}
 }
 
-/* ── مطابقة الوقت (دقيقة واحدة) ── */
+/* مطابقة الوقت (دقيقة واحدة) */
 function isTimeMatch(current, target) {
   if (!target) return false;
   return current === target;
 }
 
-/* ── طرح 5 دقائق من الوقت ── */
+/* طرح 5 دقائق من الوقت */
 function subtractMinutes(timeStr, mins) {
   if (!timeStr) return null;
   const parts = timeStr.split(':');
@@ -164,7 +162,7 @@ function subtractMinutes(timeStr, mins) {
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
-/* ── إظهار الإشعار ── */
+/* إظهار الإشعار */
 async function showAdhkarNotif(title, body, tag) {
   return self.registration.showNotification(title, {
     body: body,
@@ -179,7 +177,7 @@ async function showAdhkarNotif(title, body, tag) {
   });
 }
 
-/* ── تخزين الجدول في Cache Storage (كـ key-value store بسيط) ── */
+/* تخزين الجدول في Cache Storage (كـ key-value store بسيط) */
 const SCHED_CACHE = 'adhkar-schedule-v1';
 const SCHED_KEY   = 'adhkar-schedule-data';
 
@@ -202,7 +200,7 @@ async function getSchedule() {
   return null;
 }
 
-/* ── نقر على الإشعار ── */
+/* نقر على الإشعار */
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   const url = (e.notification.data && e.notification.data.url) || './';
@@ -218,19 +216,19 @@ self.addEventListener('notificationclick', e => {
   );
 });
 
-/* ── Push بدون حمولة: نحدد الرسالة من جدول المستخدم (آيفون يشترط إظهار إشعار دائماً) ── */
-const PUSH_MSG = { morning:['أذكار الصباح 🌅','حان وقت أذكار الصباح، ابدأ يومك بذكر الله'], evening:['أذكار المساء 🌇','حان وقت أذكار المساء، حصّن نفسك بذكر الله'],
-  ziyarat:['زيارة عاشوراء 🏴','حان وقت الزيارة والأدعية المباركة'], sleep:['أذكار النوم 🌙','آية الكرسي وأذكار النوم قبل أن تنام'] };
+
+const PUSH_MSG = { morning:['أذكار الصباح','حان وقت أذكار الصباح، ابدأ يومك بذكر الله'], evening:['أذكار المساء','حان وقت أذكار المساء، حصّن نفسك بذكر الله'],
+  ziyarat:['زيارة عاشوراء','حان وقت الزيارة والأدعية المباركة'], sleep:['أذكار النوم','آية الكرسي وأذكار النوم قبل أن تنام'] };
 const PUSH_PRAYER = { fajr:'الفجر', dhuhr:'الظهر', asr:'العصر', maghrib:'المغرب', isha:'العشاء' };
 async function pushNotif() {
-  let t = ['أذكاري 🌿', 'اذكر الله، فبذكره تطمئن القلوب'];
+  let t = ['أذكاري', 'اذكر الله، فبذكره تطمئن القلوب'];
   try {
     const s = await getSchedule(), n = new Date(), m = n.getHours() * 60 + n.getMinutes();
     const mins = h => { const [a, b] = String(h).split(':'); return +a * 60 + +b; };
     const near = h => h && Math.abs(mins(h) - m) <= 2;
     const k = s && Object.keys(PUSH_MSG).find(x => near(s[x]));
     if (k) t = PUSH_MSG[k];
-    else if (s && s.prayers) { const p = Object.keys(PUSH_PRAYER).find(x => near(s.prayers[x])); if (p) t = ['🕌 حان وقت صلاة ' + PUSH_PRAYER[p], 'حيّ على الصلاة، أرح قلبك بالسجود']; }
+    else if (s && s.prayers) { const p = Object.keys(PUSH_PRAYER).find(x => near(s.prayers[x])); if (p) t = ['حان وقت صلاة ' + PUSH_PRAYER[p], 'حيّ على الصلاة، أرح قلبك بالسجود']; }
   } catch (_) {}
   return showAdhkarNotif(t[0], t[1], 'push');
 }

@@ -1,6 +1,4 @@
-/* ════════════════════════════════════════
-   أذكاري v5 – app.js | Full Islamic PWA
-   ════════════════════════════════════════ */
+/* أذكاري v5 – app.js | Full Islamic PWA */
 'use strict';
 
 // 1. RECITERS
@@ -367,7 +365,7 @@ window.launchApp = function launchApp() {
     a.style.display = 'block';
   }
   window.scrollTo(0, 0);
-  try { toast('أهلاً وسهلاً 🌿 بارك الله في يومك'); } catch(e) {}
+  try { toast('أهلاً وسهلاً بارك الله في يومك'); } catch(e) {}
 };
 
 function go(tabId) {
@@ -459,7 +457,7 @@ function renderHadith() {
 
 function renderWird() {
   const w = WIRDS.find(x => x.d === new Date().getDay()) || WIRDS[0];
-  setEl('wird-badge', '📅 وِرْدُ يَوْمِ ' + w.name);
+  setEl('wird-badge', 'وِرْدُ يَوْمِ ' + w.name);
   setEl('wird-name', 'ذِكْرُ يَوْمِ ' + w.name);
   setEl('wird-dhikr', w.dhikr);
   refreshCounter('wird', 100);
@@ -474,24 +472,6 @@ function getCkKey(id) {
   return '';
 }
 
-function renderDuaaListLegacy() {
-  const c = document.getElementById('duaa-list');
-  if (!c) return;
-  c.innerHTML = '';
-  DUAAS.forEach(d => {
-    const done = !!S.done['duaa-' + d.id];
-    const el = document.createElement('div');
-    el.className = 'duaa-card';
-    el.innerHTML = `<div class="duaa-category"><span>${d.icon}</span> ${d.cat}</div>
-      <div class="duaa-title">${d.title}</div>
-      <div class="duaa-text">${d.text.replace(/\n/g, '<br>')}</div>
-      <div class="card-actions">
-        <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
-        <button class="btn btn-primary ${done ? 'done' : ''}" onclick="markRead(this, 'duaa-${d.id}', '${getCkKey(d.id)}')">✅ تمت القراءة</button>
-      </div>`;
-    c.appendChild(el);
-  });
-}
 
 function renderGreatDuaaList() {
   const c = document.getElementById('great-duaa-list');
@@ -505,8 +485,8 @@ function renderGreatDuaaList() {
       <div class="duaa-title">${d.title}</div>
       <div class="duaa-text">${d.text.replace(/\n/g,'<br>')}</div>
       <div class="card-actions">
-        <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
-        <button class="btn btn-primary ${done?'done':''}" onclick="markRead(this,'great-${d.id}','')">✅ تمت القراءة</button>
+        <button class="btn btn-ghost" onclick="copyCard(this)">نسخ</button>
+        <button class="btn btn-primary ${done?'done':''}" onclick="markRead(this,'great-${d.id}','')">تمت القراءة</button>
       </div>`;
     c.appendChild(el);
   });
@@ -526,8 +506,8 @@ function renderSuwarList() {
       </div>
       <div class="arabic" style="margin-bottom:1rem;line-height:2.2">${s.t.replace(/\n/g,'<br>')}</div>
       <div class="card-actions">
-        <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
-        <button class="btn btn-primary ${done?'done':''}" onclick="markRead(this,'surah-${s.id}','')">✅ تمت القراءة</button>
+        <button class="btn btn-ghost" onclick="copyCard(this)">نسخ</button>
+        <button class="btn btn-primary ${done?'done':''}" onclick="markRead(this,'surah-${s.id}','')">تمت القراءة</button>
       </div>`;
     c.appendChild(el);
   });
@@ -543,7 +523,7 @@ function renderStudyList() {
     el.innerHTML = `<div class="duaa-category"><span>${d.icon}</span> ${d.cat}</div>
       <div class="duaa-title">${d.title}</div>
       <div class="duaa-text">${d.text.replace(/\n/g,'<br>')}</div>
-      <div class="card-actions"><button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button></div>`;
+      <div class="card-actions"><button class="btn btn-ghost" onclick="copyCard(this)">نسخ</button></div>`;
     c.appendChild(el);
   });
 }
@@ -564,8 +544,8 @@ function renderKhatmah() {
 
   const doneBtn = document.getElementById('kh-done-btn');
   if (doneBtn) {
-    if (done[plan.d]) { doneBtn.textContent = '✅ أكملت الجزء – مبارك!'; doneBtn.classList.add('done'); }
-    else              { doneBtn.textContent = '✅ أكملت جزء اليوم (+100 نقطة)'; doneBtn.classList.remove('done'); }
+    if (done[plan.d]) { doneBtn.textContent = 'أكملت الجزء – مبارك!'; doneBtn.classList.add('done'); }
+    else              { doneBtn.textContent = 'أكملت جزء اليوم (+100 نقطة)'; doneBtn.classList.remove('done'); }
   }
 
   const grid = document.getElementById('kh-grid');
@@ -596,14 +576,14 @@ function doneKhatmah() {
   S.checklist['ck-khatmah'] = true;
   if (d < 30) S.khatDay = d + 1;
   saveS(); renderKhatmah(); renderChecklist(); updateStreak();
-  toast('تقبل الله! 🎉 جزاك الله خيراً (+100 نقطة)');
+  toast('تقبل الله! جزاك الله خيراً (+100 نقطة)');
 }
 
 function resetKhatmah() {
   if (!confirm('إعادة الختمة من اليوم الأول؟')) return;
   S.khatDone = {}; S.khatDay = 1; S.checklist['ck-khatmah'] = false;
   saveS(); renderKhatmah(); renderChecklist();
-  toast('تمت إعادة الختمة ✨');
+  toast('تمت إعادة الختمة');
 }
 
 // QURAN INDEX & READER
@@ -843,7 +823,7 @@ function renderTrackerDate() {
 }
 
 function launchConfetti() {
-  toast('🎉 مبارك! واصل الاستمرار في الطاعات (+50 نقطة)');
+  toast('مبارك! واصل الاستمرار في الطاعات (+50 نقطة)');
 }
 
 function newDay() {
@@ -853,7 +833,7 @@ function newDay() {
   S.checklist = {};
   saveS();
   renderAll();
-  toast('بداية يوم جديد بارك الله لك فيه 🌿');
+  toast('بداية يوم جديد بارك الله لك فيه');
 }
 
 // DHIKR COUNTERS
@@ -877,7 +857,7 @@ function refreshCounter(k, max) {
 function restoreDoneButtons() {
   Object.keys(S.done).forEach(key => {
     document.querySelectorAll(`button.btn-primary[onclick*="'${key}'"]`).forEach(btn => {
-      btn.classList.add('done'); btn.textContent = '✅ تمت القراءة';
+      btn.classList.add('done'); btn.textContent = 'تمت القراءة';
     });
   });
 }
@@ -894,7 +874,7 @@ function tapDhikr(k, max) {
   if (v >= max) {
     markDhikrDone(k);
     const labels = {subhan:'التسبيح',hamd:'التحميد',akbar:'التكبير',istighfar:'الاستغفار'};
-    toast('أحسنت! 🎉 اكتمل ' + (labels[k]||''));
+    toast('أحسنت! اكتمل ' + (labels[k]||''));
     const ckMap = {subhan:'ck-subhan',hamd:'ck-hamd',akbar:'ck-akbar',istighfar:'ck-istighfar'};
     if (ckMap[k]) { S.checklist[ckMap[k]] = true; saveS(); renderChecklist(); updateStreak(); }
     if (navigator.vibrate) navigator.vibrate([100,50,100]);
@@ -927,7 +907,7 @@ function tapWird() {
   if (ne) { ne.textContent = v; ne.classList.add('pop'); setTimeout(()=>ne.classList.remove('pop'),130); }
   if (be) be.style.width = Math.min(100, v) + '%';
   if (v >= 100) {
-    toast('أحسنت! 🎉 اكتمل وِرد اليوم');
+    toast('أحسنت! اكتمل وِرد اليوم');
     S.checklist['ck-wird'] = true; saveS(); renderChecklist(); updateStreak();
   }
 }
@@ -939,7 +919,7 @@ function tapLan() {
   if (v > 100) return;
   S.dhikr.lan = v; saveS();
   setEl('cnt-lan', v + ' / 100');
-  if (v >= 100) toast('أحسنت! اكتمل اللعن ١٠٠ مرة ✨');
+  if (v >= 100) toast('أحسنت! اكتمل اللعن ١٠٠ مرة');
 }
 
 function tapSalam() {
@@ -949,18 +929,18 @@ function tapSalam() {
   setEl('cnt-salam', v + ' / 100');
   if (v >= 100) {
     S.checklist['ck-ashura'] = true; saveS(); renderChecklist(); updateStreak();
-    toast('أحسنت! اكتمل السلام ١٠0 مرة ✨');
+    toast('أحسنت! اكتمل السلام ١٠0 مرة');
   }
 }
 
 // MARK READ & COPY
 function markRead(btn, key, ckKey) {
   if (btn.classList.contains('done')) return;
-  btn.classList.add('done'); btn.textContent = '✅ تمت القراءة';
+  btn.classList.add('done'); btn.textContent = 'تمت القراءة';
   S.done[key] = true;
   if (ckKey) { S.checklist[ckKey] = true; }
   saveS(); renderChecklist(); updateStreak();
-  toast('بارك الله فيك! ✨');
+  toast('بارك الله فيك!');
 }
 
 function copyCard(btn) {
@@ -971,7 +951,7 @@ function copyCard(btn) {
     if (t) text = t.innerText;
   }
   if (!text) text = 'جارٍ النسخ...';
-  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => toast('تم النسخ 📋')).catch(() => fbCopy(text)); }
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => toast('تم النسخ')).catch(() => fbCopy(text)); }
   else fbCopy(text);
 }
 
@@ -985,7 +965,7 @@ function fbCopy(text) {
   ta.select();
   try {
     document.execCommand('copy');
-    toast('تم النسخ 📋');
+    toast('تم النسخ');
   } catch (e) {
     toast('تعذّر النسخ تلقائياً');
   }
@@ -1035,12 +1015,12 @@ function pomoTick() {
     if (pomoisWork) {
       S.pomSess = (S.pomSess || 0) + 1;
       saveS();
-      toast('🎉 أحسنت! انتهت جلسة الدراسة (25 دقيقة). استرح 5 دقائق!');
+      toast('أحسنت! انتهت جلسة الدراسة (25 دقيقة). استرح 5 دقائق!');
       pomoisWork = false;
       pomoSeconds = 5 * 60;
       pomoMax = 5 * 60;
     } else {
-      toast('🔔 انتهت الاستراحة! استعد لجلسة دراسة جديدة.');
+      toast('انتهت الاستراحة! استعد لجلسة دراسة جديدة.');
       pomoisWork = true;
       pomoSeconds = 25 * 60;
       pomoMax = 25 * 60;
@@ -1102,18 +1082,18 @@ function toggleAthan() {
   updateAthanBtn();
   if (S.athanOn) {
     playAthan();
-    toast('🔊 تم تفعيل صبيحة الأذان الصوتية');
+    toast('تم تفعيل صبيحة الأذان الصوتية');
   } else {
     const audio = document.getElementById('athan-audio');
     if (audio) audio.pause();
-    toast('🔇 تم كتم الأذان الصوتي');
+    toast('تم كتم الأذان الصوتي');
   }
 }
 
 function updateAthanBtn() {
   const btn = document.getElementById('btn-athan');
   if (btn) {
-    btn.textContent = S.athanOn ? '📢 مفعّل' : '🔇 مكتوم';
+    btn.textContent = S.athanOn ? 'مفعّل' : 'مكتوم';
     btn.style.opacity = S.athanOn ? '1' : '0.6';
   }
 }
@@ -1160,7 +1140,7 @@ async function saveReminders() {
   saveS();
   closeReminder();
   await enablePush();
-  toast('🔔 تم حفظ مواعيد الإشعارات وتفعيل التنبيهات بنجاح');
+  toast('تم حفظ مواعيد الإشعارات وتفعيل التنبيهات بنجاح');
 }
 
 async function testNotif() {
@@ -1169,14 +1149,14 @@ async function testNotif() {
     return;
   }
   if (Notification.permission === 'granted') {
-    await sendNotif('أذكاري 🌿', 'هذا إشعار تجريبي من موقع أذكاري! تقبل الله طاعاتكم ✨');
-    toast('تم إرسال إشعار تجريبي 🔔');
+    await sendNotif('أذكاري', 'هذا إشعار تجريبي من موقع أذكاري! تقبل الله طاعاتكم');
+    toast('تم إرسال إشعار تجريبي');
   } else {
     try {
       const perm = await Notification.requestPermission();
       if (perm === 'granted') {
-        await sendNotif('أذكاري 🌿', 'تم تفعيل الإشعارات بنجاح في تطبيق أذكاري! ✨');
-        toast('تم تفعيل وإرسال إشعار تجريبي 🔔');
+        await sendNotif('أذكاري', 'تم تفعيل الإشعارات بنجاح في تطبيق أذكاري!');
+        toast('تم تفعيل وإرسال إشعار تجريبي');
       } else {
         toast('يرجى السماح بالإشعارات في إعدادات المتصفح/الجهاز');
       }
@@ -1195,21 +1175,21 @@ function checkReminders() {
   const rem = S.reminders || {};
   if (timeStr === rem.morning) {
     lastNotifMin = timeStr;
-    sendNotif('أذكار الصباح 🌅', 'حان وقت أذكار الصباح، ابدأ يومك بذكر الله!');
+    sendNotif('أذكار الصباح', 'حان وقت أذكار الصباح، ابدأ يومك بذكر الله!');
   } else if (timeStr === rem.evening) {
     lastNotifMin = timeStr;
-    sendNotif('أذكار المساء 🌇', 'حان وقت أذكار المساء، حصّن نفسك بذكر الله!');
+    sendNotif('أذكار المساء', 'حان وقت أذكار المساء، حصّن نفسك بذكر الله!');
   } else if (timeStr === rem.ziyarat) {
     lastNotifMin = timeStr;
-    sendNotif('زيارة عاشوراء 🏴', 'حان وقت زيارة عاشوراء والأدعية المباركة.');
+    sendNotif('زيارة عاشوراء', 'حان وقت زيارة عاشوراء والأدعية المباركة.');
   } else if (timeStr === rem.sleep) {
     lastNotifMin = timeStr;
-    sendNotif('أذكار النوم 🌙', 'حان وقت أذكار النوم وآية الكرسي، نوم هنيئاً معطر بذكر الله.');
+    sendNotif('أذكار النوم', 'حان وقت أذكار النوم وآية الكرسي، نوم هنيئاً معطر بذكر الله.');
   }
 }
 
 async function sendNotif(title, body) {
-  toast(`🔔 ${title}: ${body}`);
+  toast(`${title}: ${body}`);
   if ('Notification' in window && Notification.permission === 'granted') {
     if ('serviceWorker' in navigator) {
       try {
@@ -1272,7 +1252,7 @@ function tapTasbih() {
     if (bar) bar.style.width = (tasbihCount / tasbihMax * 100) + '%';
     if (navigator.vibrate) navigator.vibrate(40);
     if (tasbihCount >= tasbihMax) {
-      toast('🎉 اكتمل التسبيح (' + tasbihWord + ')');
+      toast('اكتمل التسبيح (' + tasbihWord + ')');
       if (navigator.vibrate) navigator.vibrate([100,50,100]);
     }
   }
@@ -1303,7 +1283,7 @@ function saveIstiNote() {
   S.done['isti-note'] = text;
   saveS();
   loadIstiNote();
-  toast('💾 تم حفظ نتيجة/ملاحظة الاستخارة');
+  toast('تم حفظ نتيجة/ملاحظة الاستخارة');
 }
 
 function clearIstiNote() {
@@ -1323,7 +1303,7 @@ function loadIstiNote() {
   if (el) {
     if (text) {
       el.innerHTML = `<div style="background:var(--card-bg);padding:1rem;border-radius:12px;border:1px solid var(--g3);margin-top:.8rem">
-        <div style="font-weight:700;color:var(--g3);margin-bottom:.4rem">📌 الملاحظة المحفوظة:</div>
+        <div style="font-weight:700;color:var(--g3);margin-bottom:.4rem">الملاحظة المحفوظة:</div>
         <div>${text.replace(/\n/g,'<br>')}</div>
       </div>`;
     } else {
@@ -1346,7 +1326,7 @@ function normAr(text) {
 }
 
 function generateAiReply(q) {
-  if (!q || !q.trim()) return 'أهلاً بك 🌿 أنا مساعدك الذكي الشامل، تفضل بطرح أي سؤال وسأجيبك فوراً بإجابة وافية ودقيقة إن شاء الله!';
+  if (!q || !q.trim()) return 'أهلاً بك أنا مساعدك الذكي الشامل، تفضل بطرح أي سؤال وسأجيبك فوراً بإجابة وافية ودقيقة إن شاء الله!';
   const raw = q.trim();
   const norm = normAr(raw);
 
@@ -1354,16 +1334,16 @@ function generateAiReply(q) {
 
   // 1. التحيات والترحيب والتواصل
   if (has('سلام', 'السلام')) {
-    return 'وعليكم السلام ورحمة الله وبركاته 🌿\nأهلاً وسهلاً بك في تطبيق أذكاري! حياك الله، كيف أستطيع مساعدتك اليوم؟ أنا جاهز للإجابة عن أي سؤال في الدين، السيرة، العلوم، الفقه، أو الحياة العامة.';
+    return 'وعليكم السلام ورحمة الله وبركاته\nأهلاً وسهلاً بك في تطبيق أذكاري! حياك الله، كيف أستطيع مساعدتك اليوم؟ أنا جاهز للإجابة عن أي سؤال في الدين، السيرة، العلوم، الفقه، أو الحياة العامة.';
   }
   if (has('مرحبا', 'اهدا', 'اهلا', 'هلا', 'حي الله')) {
-    return 'أهلاً وسهلاً بك 🌸 يسرني جداً تواصلك! تفضل بطرح أي سؤال وسأجيبك فوراً بكل سرور ودقة.';
+    return 'أهلاً وسهلاً بك يسرني جداً تواصلك! تفضل بطرح أي سؤال وسأجيبك فوراً بكل سرور ودقة.';
   }
   if (has('كيف حالك', 'شخبارك', 'كيفك', 'من انت', 'من انت')) {
-    return 'الحمد لله حمداً كثيراً طيّباً مباركاً فيه 🌿 أنا بخير ومستعد تماماً لإجابتك عن أي سؤال ديني، فقهي، علمي، أو استفسار شخصي.';
+    return 'الحمد لله حمداً كثيراً طيّباً مباركاً فيه أنا بخير ومستعد تماماً لإجابتك عن أي سؤال ديني، فقهي، علمي، أو استفسار شخصي.';
   }
   if (has('شكرا', 'جزاك الله')) {
-    return 'العفو يا طيب 🌿 الشكر لله وحدَه، وأنا في خدمتك دائماً في أي وقت!';
+    return 'العفو يا طيب الشكر لله وحدَه، وأنا في خدمتك دائماً في أي وقت!';
   }
 
   // 2. الإمام علي بن أبي طالب (عليه السلام)
@@ -1458,7 +1438,7 @@ function generateAiReply(q) {
 
   // 7. الصحة، الجسم، التغذية، والطب
   if (has('ماء', 'شرب الماء')) {
-    return '💧 **فوائد شرب الماء للجسم:**\n1. ينشط الدورة الدموية ويغذي خلايا الدماغ.\n2. يساعد الكلى في طرد السموم.\n3. يحافظ على نضارة البشرة والصحة العامة.\n💡 يُنصح بشرب 2 إلى 3 لترات يومياً.';
+    return '💧 **فوائد شرب الماء للجسم:**\n1. ينشط الدورة الدموية ويغذي خلايا الدماغ.\n2. يساعد الكلى في طرد السموم.\n3. يحافظ على نضارة البشرة والصحة العامة.\nيُنصح بشرب 2 إلى 3 لترات يومياً.';
   }
   if (has('نوم', 'ساعات النوم')) {
     return '🌙 **أهمية النوم الصحي:**\nالنوم من 7 إلى 8 ساعات ليلاً يقوي جهاز المناعة، ينظم هرمونات الجسم، ويجدد طاقة العقل والتركيز.';
@@ -1527,7 +1507,7 @@ function sendAiMessage() {
 
   const typingDiv = document.createElement('div');
   typingDiv.className = 'chat-msg ai typing';
-  typingDiv.innerHTML = `<div class="chat-avatar">🤖</div><div class="chat-bubble">جارٍ التفكير والإجابة... 💭</div>`;
+  typingDiv.innerHTML = `<div class="chat-avatar">🤖</div><div class="chat-bubble">جارٍ التفكير والإجابة...</div>`;
   box.appendChild(typingDiv);
   box.scrollTop = box.scrollHeight;
 
@@ -1616,7 +1596,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ═══ DUAS LIBRARY PLUS: بحث + تصنيفات + مفضلة + مشاركة ═══
+// DUAS LIBRARY PLUS: بحث + تصنيفات + مفضلة + مشاركة
 const DUAS_PLUS = [
  {id:'q1',icon:'📖',cat:'أدعية قرآنية',title:'حسنة الدنيا والآخرة',src:'البقرة: ٢٠١',text:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ'},
  {id:'q2',icon:'📖',cat:'أدعية قرآنية',title:'خواتيم البقرة',src:'البقرة: ٢٨٦',text:'رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا أَنتَ مَوْلَانَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ'},
@@ -1646,7 +1626,7 @@ const DUAS_PLUS = [
  {id:'a3',icon:'🌅',cat:'أهل البيت (ع)',title:'دعاء الحجة (عج) – اللهم كن لوليك',src:'دعاء مأثور للإمام المهدي (عج)',text:'اللَّهُمَّ كُنْ لِوَلِيِّكَ الْحُجَّةِ بْنِ الْحَسَنِ، صَلَوَاتُكَ عَلَيْهِ وَعَلَى آبَائِهِ، فِي هَذِهِ السَّاعَةِ وَفِي كُلِّ سَاعَةٍ، وَلِيًّا وَحَافِظًا وَقَائِدًا وَنَاصِرًا وَدَلِيلًا وَعَيْنًا، حَتَّى تُسْكِنَهُ أَرْضَكَ طَوْعًا وَتُمَتِّعَهُ فِيهَا طَوِيلًا'}
 ];
 
-// ── المفضلة ──
+// المفضلة
 let FAVS = []; try { FAVS = JSON.parse(localStorage.getItem('adhkar_favs') || '[]'); } catch (e) {}
 let duaCat = 'الكل', duaQ = '', duaOnly = '';
 function toggleFav(id) {
@@ -1668,15 +1648,15 @@ function renderDuaaList(keepFocus) {
   const all = allDuas();
   let tools = document.getElementById('duaa-tools');
   if (!tools) { tools = document.createElement('div'); tools.id = 'duaa-tools'; c.parentNode.insertBefore(tools, c); }
-  const cats = ['الكل', '⭐ المفضلة', ...new Set(all.map(d => d.cat))];
+  const cats = ['الكل', 'المفضلة', ...new Set(all.map(d => d.cat))];
   if (!keepFocus) {
     tools.innerHTML = `<input class="dua-search" type="search" placeholder="ابحث في ${all.length} دعاء..." oninput="setDuaQ(this.value)" value="${escapeHtml(duaQ)}">
       <div class="dua-chips"><button class="dua-chip ${duaOnly ? 'on' : ''}" onclick="randomDua()">دعاء عشوائي</button><button class="dua-chip" onclick="addCustomDua()">+ أضف دعاءك</button>${cats.map(k => `<button class="dua-chip ${k === duaCat ? 'on' : ''}" onclick="setDuaCat(this.textContent.trim())">${k}</button>`).join('')}</div>`;
   }
   const q = normAr(duaQ);
-  const list = all.filter(d => (!duaOnly || d.id === duaOnly) && (duaCat === 'الكل' || (duaCat === '⭐ المفضلة' ? FAVS.includes(d.id) : d.cat === duaCat)) &&
+  const list = all.filter(d => (!duaOnly || d.id === duaOnly) && (duaCat === 'الكل' || (duaCat === 'المفضلة' ? FAVS.includes(d.id) : d.cat === duaCat)) &&
     (!q || normAr(d.title + ' ' + d.text + ' ' + d.cat).includes(q)));
-  c.innerHTML = list.length ? '' : '<div class="dua-empty">لا توجد نتائج 🌙</div>';
+  c.innerHTML = list.length ? '' : '<div class="dua-empty">لا توجد نتائج</div>';
   list.forEach(d => {
     const done = !!S.done['duaa-' + d.id], fav = FAVS.includes(d.id);
     const el = document.createElement('div'); el.className = 'duaa-card';
@@ -1684,12 +1664,12 @@ function renderDuaaList(keepFocus) {
       <div class="duaa-title">${d.title}</div>
       <div class="duaa-text">${d.text.replace(/\n/g, '<br>')}</div>
       <div class="card-actions">
-        <button class="btn btn-ghost" onclick="copyCard(this)">📋 نسخ</button>
+        <button class="btn btn-ghost" onclick="copyCard(this)">نسخ</button>
         <button class="btn btn-ghost" onclick="shareDua('${d.id}')">مشاركة</button>
         <button class="btn btn-ghost" onclick="speakDua('${d.id}')">استماع</button>
         <button class="btn btn-ghost" onclick="shareDuaImage('${d.id}')">صورة</button>${d.custom ? `<button class="btn btn-ghost" onclick="delCustom('${d.id}')">حذف</button>` : ''}
         <button class="btn btn-ghost ${fav ? 'fav' : ''}" onclick="toggleFav('${d.id}')">${fav ? '⭐' : '☆'}</button>
-        <button class="btn btn-primary ${done ? 'done' : ''}" onclick="markRead(this,'duaa-${d.id}','${getCkKey(d.id)}')">✅ تمت القراءة</button>
+        <button class="btn btn-primary ${done ? 'done' : ''}" onclick="markRead(this,'duaa-${d.id}','${getCkKey(d.id)}')">تمت القراءة</button>
       </div>`;
     c.appendChild(el);
   });
@@ -1709,37 +1689,51 @@ Object.assign(window, {
   loadIstiNote, openReminder, closeReminder, saveReminders, testNotif, sendAiMessage, sendQuickQ, generateAiReply
 });
 
-// ═══ AI الحقيقي (عبر Worker) + Push + تلميح iOS ═══
+
 const CFG = window.ADHKARI_CONFIG || {};
 let AI_HIST = [];
 async function askAIServer(q) {
   if (!CFG.AI_ENDPOINT) return null;
   try {
-    const r = await fetch(CFG.AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [...AI_HIST.slice(-8), { role: 'user', content: q }] }) });
+    const r = await fetch(CFG.AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [...AI_HIST.slice(-8), { role: 'user', content: q }] }) });
     return r.ok ? (await r.json()).reply || null : null;
-  } catch (e) { return null; }
+  } catch (e) {
+    return null;
+  }
 }
 const b64u = s => Uint8Array.from(atob((s + '='.repeat((4 - s.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 const IS_STANDALONE = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
 async function enablePush() {
   if (!('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window)) {
-    if (IS_IOS && !IS_STANDALONE) showInstallHint(true); else toast('متصفحك لا يدعم الإشعارات');
+    if (IS_IOS && !IS_STANDALONE) showInstallHint(true);
+    else toast('متصفحك لا يدعم الإشعارات');
     return false;
   }
   if (Notification.permission !== 'granted' && (await Notification.requestPermission()) !== 'granted') {
-    toast('فعّل الإشعارات من إعدادات الجهاز'); return false;
+    toast('فعّل الإشعارات من إعدادات الجهاز');
+    return false;
   }
   let vk = CFG.VAPID_PUBLIC_KEY;
-  if (!vk && CFG.PUSH_ENDPOINT) { try { const r = await fetch(CFG.PUSH_ENDPOINT + '/key'); if (r.ok) vk = (await r.text()).trim(); } catch (e) {} }
-  if (!CFG.PUSH_ENDPOINT || !/^[\w-]{86,88}$/.test(vk || '')) { syncPush(); return true; }
+  if (!vk && CFG.PUSH_ENDPOINT) {
+    try {
+      const r = await fetch(CFG.PUSH_ENDPOINT + '/key');
+      if (r.ok) vk = (await r.text()).trim();
+    } catch (e) {
+    }
+  }
+  if (!CFG.PUSH_ENDPOINT || !/^[\w-]{86,88}$/.test(vk || '')) {
+    syncPush();
+    return true;
+  }
   try {
     const reg = await navigator.serviceWorker.ready;
-    const sub = (await reg.pushManager.getSubscription()) ||
-      await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(vk) });
+    const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(vk) });
     await syncPush(sub);
-  } catch (e) { toast('تعذّر تفعيل الإشعارات'); return false; }
+  } catch (e) {
+    toast('تعذّر تفعيل الإشعارات');
+    return false;
+  }
   return true;
 }
 async function syncPush(sub) {
@@ -1747,225 +1741,410 @@ async function syncPush(sub) {
     const reg = await navigator.serviceWorker.ready;
     sub = sub || await reg.pushManager.getSubscription();
     const prayers = {};
-    Object.entries(prayerTimes || {}).forEach(([k, v]) => { if (typeof v === 'string') prayers[k.toLowerCase()] = v.slice(0, 5); });
+    Object.entries(prayerTimes || {}).forEach(([k, v]) => {
+      if (typeof v === 'string') prayers[k.toLowerCase()] = v.slice(0, 5);
+    });
     const times = { ...S.reminders, prayers };
     if (reg.active) reg.active.postMessage({ type: 'SCHEDULE_NOTIFS', schedule: { ...times, athanAlert: S.athanOn } });
     if (!sub || !CFG.PUSH_ENDPOINT) return;
-    await fetch(CFG.PUSH_ENDPOINT + '/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sub: sub.toJSON(), tz: Intl.DateTimeFormat().resolvedOptions().timeZone, times, athan: S.athanOn }) });
-  } catch (e) {}
+    await fetch(CFG.PUSH_ENDPOINT + '/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub: sub.toJSON(), tz: Intl.DateTimeFormat().resolvedOptions().timeZone, times, athan: S.athanOn }) });
+  } catch (e) {
+  }
 }
 function showInstallHint(force) {
   if (document.getElementById('ios-hint') || (!force && localStorage.getItem('ios_hint_off'))) return;
-  const el = document.createElement('div'); el.id = 'ios-hint'; el.className = 'ios-hint';
-  el.innerHTML = `<b>📲 لتصلك الإشعارات على آيفون</b><ol><li>اضغط زر المشاركة ⎋ في Safari</li><li>اختر «إضافة إلى الشاشة الرئيسية»</li><li>افتح التطبيق من الأيقونة ثم فعّل الإشعارات 🔔</li></ol><button onclick="localStorage.setItem('ios_hint_off',1);this.parentNode.remove()">فهمت</button>`;
+  const el = document.createElement('div');
+  el.id = 'ios-hint';
+  el.className = 'ios-hint';
+  el.innerHTML = `<b>لتصلك الإشعارات على آيفون</b><ol><li>اضغط زر المشاركة ⎋ في Safari</li><li>اختر «إضافة إلى الشاشة الرئيسية»</li><li>افتح التطبيق من الأيقونة ثم فعّل الإشعارات</li></ol><button onclick="localStorage.setItem('ios_hint_off',1);this.parentNode.remove()">فهمت</button>`;
   document.body.appendChild(el);
 }
 window.addEventListener('load', () => {
   if (IS_IOS && !IS_STANDALONE) setTimeout(() => showInstallHint(false), 2500);
-  setTimeout(() => { if ('Notification' in window && Notification.permission === 'granted') syncPush(); }, 4500);
+  setTimeout(() => {
+    if ('Notification' in window && Notification.permission === 'granted') syncPush();
+  }, 4500);
 });
 Object.assign(window, { enablePush, syncPush, showInstallHint });
-
-// ═══ نُور UI: كشف تدريجي + تمرير الدوك + اهتزاز اللمس ═══
 (function () {
   document.documentElement.classList.add('js-rv');
   const SEL = '.card,.duaa-card,.dhikr-card,.ziyarat-card,.ashura-duaa,.quran-card,.stat-box,.achievement,.hadith-box,.story-card,.cl-item';
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
-    e.target.classList.add('in'); io.unobserve(e.target);
+    e.target.classList.add('in');
+    io.unobserve(e.target);
     setTimeout(() => e.target.classList.remove('rv', 'in'), 900);
   }), { threshold: .06 });
   const arm = n => {
     if (n.nodeType !== 1) return;
     [...(n.matches(SEL) ? [n] : []), ...n.querySelectorAll(SEL)].forEach(el => {
-      if (el.dataset.rv) return; el.dataset.rv = 1; el.classList.add('rv'); io.observe(el);
+      if (el.dataset.rv) return;
+      el.dataset.rv = 1;
+      el.classList.add('rv');
+      io.observe(el);
     });
   };
   new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(arm))).observe(document.body, { childList: true, subtree: true });
   window.addEventListener('load', () => arm(document.body));
   const _go = window.go;
-  window.go = function (t) { _go(t); requestAnimationFrame(() => { const b = document.querySelector('.tab-btn.active'); if (b) b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); }); };
-  document.addEventListener('click', e => { if (navigator.vibrate && e.target.closest('.dhikr-tap,.tasbih-tap-btn,.tasbih-chip,.cl-item')) navigator.vibrate(10); });
+  window.go = function (t) {
+    _go(t);
+    requestAnimationFrame(() => {
+      const b = document.querySelector('.tab-btn.active');
+      if (b) b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    });
+  };
+  document.addEventListener('click', e => {
+    if (navigator.vibrate && e.target.closest('.dhikr-tap,.tasbih-tap-btn,.tasbih-chip,.cl-item')) navigator.vibrate(10);
+  });
 })();
-
-// ═══ ميزات نُور: الإعدادات + ألوان + نسخ احتياطي + مشاركة ═══
 const ACCENTS = { ink: ['لازوردي', '#1d4f9c'], olive: ['زمردي', '#0f7a5c'], wine: ['ياقوتي', '#a3243b'], slate: ['عنبري', '#8a5a14'] };
 const SITE_URL = 'https://qurandua.online/';
 function setAccent(k) {
   document.documentElement.dataset.accent = k;
-  try { localStorage.setItem('nur_accent', k); } catch (e) {}
-  document.querySelectorAll('.nur-sw').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  try {
+    localStorage.setItem('adhkari_accent', k);
+  } catch (e) {
+  }
+  document.querySelectorAll('.set-swatch').forEach(b => b.classList.toggle('on', b.dataset.k === k));
 }
-setAccent((function () { try { return localStorage.getItem('nur_accent') || 'ink'; } catch (e) { return 'ink'; } })());
+setAccent((function () {
+  try {
+    return localStorage.getItem('adhkari_accent') || 'ink';
+  } catch (e) {
+    return 'ink';
+  }
+})());
 function openSettings() {
-  if (document.getElementById('nur-set')) return;
+  if (document.getElementById('settings-sheet')) return;
   const cur = document.documentElement.dataset.accent;
-  const el = document.createElement('div'); el.id = 'nur-set'; el.className = 'nur-ov';
-  el.onclick = e => { if (e.target === el) el.remove(); };
-  el.innerHTML = `<div class="nur-sheet"><h3>⚙️ الإعدادات</h3>
-    <div class="nur-sec">المظهر</div><div class="nur-row">${[['light','فاتح'],['dark','ليلي مريح'],['auto','تلقائي']].map(([k,t])=>`<button class="btn btn-ghost nur-th" data-m="${k}" onclick="setTheme('${k}')">${t}</button>`).join('')}</div><div class="nur-sec">لون التطبيق</div>
-    <div class="nur-acc">${Object.entries(ACCENTS).map(([k, v]) => `<button class="nur-sw ${k === cur ? 'on' : ''}" data-k="${k}" title="${v[0]}" style="background:${v[1]}" onclick="setAccent('${k}')">${v[0]}</button>`).join('')}</div>
-    <div class="nur-sec">🔔 الإشعارات</div>
-    <div class="nur-row"><button class="btn btn-primary" onclick="enablePush().then(ok=>ok&&toast('✅ تم تفعيل الإشعارات'))">تفعيل الإشعارات</button><button class="btn btn-ghost" onclick="document.getElementById('nur-set').remove();openReminder()">⏰ المواعيد</button></div>
-    <div class="nur-sec">💾 بياناتي</div>
-    <div class="nur-row"><button class="btn btn-ghost" onclick="exportData()">⬇️ نسخة احتياطية</button><label class="btn btn-ghost">⬆️ استعادة<input type="file" accept=".json" hidden onchange="importData(this.files[0])"></label></div>
-    <div class="nur-sec">📲 التطبيق</div>
+  const el = document.createElement('div');
+  el.id = 'settings-sheet';
+  el.className = 'sheet-ov';
+  el.onclick = e => {
+    if (e.target === el) el.remove();
+  };
+  el.innerHTML = `<div class="sheet"><h3>الإعدادات</h3>
+    <div class="set-sec">المظهر</div><div class="set-row">${[['light','فاتح'],['dark','ليلي مريح'],['auto','تلقائي']].map(([k,t])=>`<button class="btn btn-ghost set-theme" data-m="${k}" onclick="setTheme('${k}')">${t}</button>`).join('')}</div><div class="set-sec">لون التطبيق</div>
+    <div class="set-colors">${Object.entries(ACCENTS).map(([k, v]) => `<button class="set-swatch ${k === cur ? 'on' : ''}" data-k="${k}" title="${v[0]}" style="background:${v[1]}" onclick="setAccent('${k}')">${v[0]}</button>`).join('')}</div>
+    <div class="set-sec">الإشعارات</div>
+    <div class="set-row"><button class="btn btn-primary" onclick="enablePush().then(ok=>ok&&toast('تم تفعيل الإشعارات'))">تفعيل الإشعارات</button><button class="btn btn-ghost" onclick="document.getElementById('settings-sheet').remove();openReminder()">المواعيد</button></div>
+    <div class="set-sec">بياناتي</div>
+    <div class="set-row"><button class="btn btn-ghost" onclick="exportData()">⬇نسخة احتياطية</button><label class="btn btn-ghost">⬆استعادة<input type="file" accept=".json" hidden onchange="importData(this.files[0])"></label></div>
+    <div class="set-sec">التطبيق</div>
     <button class="btn btn-ghost" onclick="shareApp()">مشاركة أذكاري مع أحبّتك</button>
-    <button class="btn btn-ghost nur-danger" onclick="resetAll()">🗑️ مسح كل البيانات</button>
-    <p class="nur-foot">أوقات الصلاة بالطريقة الجعفرية (معهد ليوا – قم)<br>أذكاري · qurandua.online</p></div>`;
-  document.body.appendChild(el); markTheme();
+    <button class="btn btn-ghost set-danger" onclick="resetAll()">مسح كل البيانات</button>
+    <p class="set-foot">أوقات الصلاة بالطريقة الجعفرية (معهد ليوا – قم)<br>أذكاري · qurandua.online</p></div>`;
+  document.body.appendChild(el);
+  markTheme();
 }
 function exportData() {
   const o = { app: 'adhkari', at: new Date().toISOString(), S: JSON.parse(localStorage.getItem('adhkar_v5') || '{}'), favs: FAVS, accent: document.documentElement.dataset.accent };
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: 'application/json' }));
-  a.download = 'adhkari-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: 'application/json' }));
+  a.download = 'adhkari-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 function importData(f) {
   if (!f) return;
   const r = new FileReader();
-  r.onload = () => { try { const o = JSON.parse(r.result); if (o.app !== 'adhkari' || !o.S) throw 0;
-    localStorage.setItem('adhkar_v5', JSON.stringify(o.S)); localStorage.setItem('adhkar_favs', JSON.stringify(o.favs || [])); if (o.accent) localStorage.setItem('nur_accent', o.accent);
-    toast('✅ تمت الاستعادة'); setTimeout(() => location.reload(), 700); } catch (e) { toast('⚠️ ملف غير صالح'); } };
+  r.onload = () => {
+    try {
+      const o = JSON.parse(r.result);
+      if (o.app !== 'adhkari' || !o.S) throw 0;
+      localStorage.setItem('adhkar_v5', JSON.stringify(o.S));
+      localStorage.setItem('adhkar_favs', JSON.stringify(o.favs || []));
+      if (o.accent) localStorage.setItem('adhkari_accent', o.accent);
+      toast('تمت الاستعادة');
+      setTimeout(() => location.reload(), 700);
+    } catch (e) {
+      toast('ملف غير صالح');
+    }
+  };
   r.readAsText(f);
 }
 function shareApp() {
   const d = { title: 'أذكاري', text: 'أذكاري – رفيقك الإسلامي اليومي: أذكار، أدعية، ختمة، أوقات الصلاة ومساعد ديني', url: SITE_URL };
-  if (navigator.share) navigator.share(d).catch(() => {}); else fbCopy(SITE_URL);
+  if (navigator.share) navigator.share(d).catch(() => {
+  });
+  else fbCopy(SITE_URL);
 }
-function resetAll() { if (confirm('سيتم مسح كل تقدمك وإعداداتك نهائياً. متأكد؟')) { localStorage.clear(); location.reload(); } }
+function resetAll() {
+  if (confirm('سيتم مسح كل تقدمك وإعداداتك نهائياً. متأكد؟')) {
+    localStorage.clear();
+    location.reload();
+  }
+}
 window.addEventListener('DOMContentLoaded', () => {
-  const nr = document.querySelector('.nav-right'); if (!nr) return;
-  const ai = nr.querySelector('[onclick="go(\'ai\')"]'); if (ai) ai.remove();
-  const b = document.createElement('button'); b.className = 'nav-btn'; b.title = 'الإعدادات'; b.setAttribute('onclick', 'openSettings()'); nr.appendChild(b);
+  const nr = document.querySelector('.nav-right');
+  if (!nr) return;
+  const ai = nr.querySelector('[onclick="go(\'ai\')"]');
+  if (ai) ai.remove();
+  const b = document.createElement('button');
+  b.className = 'nav-btn';
+  b.title = 'الإعدادات';
+  b.setAttribute('onclick', 'openSettings()');
+  nr.appendChild(b);
 });
 Object.assign(window, { openSettings, setAccent, exportData, importData, shareApp, resetAll, randomDua });
-
-// ═══ مِداد: مظهر تلقائي + أدعيتي + استماع + مشاركة كصورة + تنظيف الأيقونات ═══
-let CUSTOM = []; try { CUSTOM = JSON.parse(localStorage.getItem('adhkari_custom') || '[]'); } catch (e) {}
-function allDuas() { return [...DUAAS, ...DUAS_PLUS, ...CUSTOM]; }
+let CUSTOM = [];
+try {
+  CUSTOM = JSON.parse(localStorage.getItem('adhkari_custom') || '[]');
+} catch (e) {
+}
+function allDuas() {
+  return [...DUAAS, ...DUAS_PLUS, ...CUSTOM];
+}
 const sysDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
 function applyTheme() {
-  const m = localStorage.getItem('nur_theme') || 'auto';
-  S.darkMode = m === 'auto' ? sysDark() : m === 'dark'; applyDark();
-  const t = document.querySelector('meta[name=theme-color]'); if (t) t.content = S.darkMode ? '#050d1d' : '#0d2147';
+  const m = localStorage.getItem('adhkari_theme') || 'auto';
+  S.darkMode = m === 'auto' ? sysDark() : m === 'dark';
+  applyDark();
+  const t = document.querySelector('meta[name=theme-color]');
+  if (t) t.content = S.darkMode ? '#050d1d' : '#0d2147';
 }
-function markTheme() { const m = localStorage.getItem('nur_theme') || 'auto'; document.querySelectorAll('.nur-th').forEach(b => b.classList.toggle('on', b.dataset.m === m)); }
-function setTheme(m) { try { localStorage.setItem('nur_theme', m); } catch (e) {} applyTheme(); markTheme(); }
+function markTheme() {
+  const m = localStorage.getItem('adhkari_theme') || 'auto';
+  document.querySelectorAll('.set-theme').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+}
+function setTheme(m) {
+  try {
+    localStorage.setItem('adhkari_theme', m);
+  } catch (e) {
+  }
+  applyTheme();
+  markTheme();
+}
 window.toggleDark = () => setTheme(S.darkMode ? 'light' : 'dark');
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if ((localStorage.getItem('nur_theme') || 'auto') === 'auto') applyTheme(); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if ((localStorage.getItem('adhkari_theme') || 'auto') === 'auto') applyTheme();
+});
 window.addEventListener('DOMContentLoaded', () => setTimeout(applyTheme, 0));
 function sheet(html) {
-  const el = document.createElement('div'); el.className = 'nur-ov'; el.onclick = e => { if (e.target === el) el.remove(); };
-  el.innerHTML = '<div class="nur-sheet">' + html + '</div>'; document.body.appendChild(el); return el;
+  const el = document.createElement('div');
+  el.className = 'sheet-ov';
+  el.onclick = e => {
+    if (e.target === el) el.remove();
+  };
+  el.innerHTML = '<div class="sheet">' + html + '</div>';
+  document.body.appendChild(el);
+  return el;
 }
 function addCustomDua() {
   const el = sheet('<h3>أضف دعاءك</h3><input id="cd-t" placeholder="العنوان (مثال: دعائي للتوفيق)"><textarea id="cd-x" placeholder="اكتب الدعاء هنا..."></textarea><button class="btn btn-primary" id="cd-s">حفظ</button>');
   el.querySelector('#cd-s').onclick = () => {
-    const t = el.querySelector('#cd-t').value.trim(), x = el.querySelector('#cd-x').value.trim(); if (!x) return toast('اكتب نص الدعاء');
+    const t = el.querySelector('#cd-t').value.trim(), x = el.querySelector('#cd-x').value.trim();
+    if (!x) return toast('اكتب نص الدعاء');
     CUSTOM.push({ id: 'c' + Date.now(), icon: '', cat: 'أدعيتي', title: t || 'دعاء', text: x, src: 'من إضافتك', custom: true });
-    localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM)); el.remove(); duaCat = 'أدعيتي'; renderDuaaList(); toast('تم حفظ دعائك');
+    localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM));
+    el.remove();
+    duaCat = 'أدعيتي';
+    renderDuaaList();
+    toast('تم حفظ دعائك');
   };
 }
-function delCustom(id) { if (!confirm('حذف هذا الدعاء؟')) return; CUSTOM = CUSTOM.filter(x => x.id !== id); localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM)); if (!CUSTOM.length) duaCat = 'الكل'; renderDuaaList(); }
+function delCustom(id) {
+  if (!confirm('حذف هذا الدعاء؟')) return;
+  CUSTOM = CUSTOM.filter(x => x.id !== id);
+  localStorage.setItem('adhkari_custom', JSON.stringify(CUSTOM));
+  if (!CUSTOM.length) duaCat = 'الكل';
+  renderDuaaList();
+}
 function speakDua(id) {
-  const d = allDuas().find(x => x.id === id); if (!d || !('speechSynthesis' in window)) return toast('جهازك لا يدعم القراءة الصوتية');
-  if (speechSynthesis.speaking) { speechSynthesis.cancel(); return; }
-  const u = new SpeechSynthesisUtterance(d.text.replace(/[ۖ-ۭ]/g, '')); u.lang = 'ar-SA'; u.rate = .82; speechSynthesis.speak(u);
+  const d = allDuas().find(x => x.id === id);
+  if (!d || !('speechSynthesis' in window)) return toast('جهازك لا يدعم القراءة الصوتية');
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(d.text.replace(/[ۖ-ۭ]/g, ''));
+  u.lang = 'ar-SA';
+  u.rate = .82;
+  speechSynthesis.speak(u);
 }
 async function shareDuaImage(id) {
-  const d = allDuas().find(x => x.id === id); if (!d) return; if (document.fonts) await document.fonts.ready;
+  const d = allDuas().find(x => x.id === id);
+  if (!d) return;
+  if (document.fonts) await document.fonts.ready;
   const W = 1080, P = 110, dark = document.documentElement.classList.contains('dark');
   const bg = dark ? '#07101f' : '#f7f0dc', ink = dark ? '#e9e0c9' : '#1c1a15', br = dark ? '#cfa955' : '#9a7326', FT = '58px "Amiri Quran","Amiri",serif';
-  const m = document.createElement('canvas').getContext('2d'); m.font = FT; m.direction = 'rtl';
-  const lines = []; let cur = '';
-  d.text.split('\n').forEach(par => { cur = ''; par.split(' ').forEach(w => { const t = cur ? cur + ' ' + w : w; if (m.measureText(t).width > W - P * 2 && cur) { lines.push(cur); cur = w; } else cur = t; }); lines.push(cur); });
-  const LH = 108, H = Math.max(1350, 420 + lines.length * LH + 260), c = document.createElement('canvas'); c.width = W; c.height = H;
-  const x = c.getContext('2d'); x.direction = 'rtl'; x.textAlign = 'center';
-  x.fillStyle = bg; x.fillRect(0, 0, W, H); x.strokeStyle = br; x.lineWidth = 4; x.strokeRect(44, 44, W - 88, H - 88); x.lineWidth = 1.5; x.strokeRect(62, 62, W - 124, H - 124);
-  x.fillStyle = br; x.font = '700 70px "Amiri",serif'; x.fillText(d.title, W / 2, 190);
-  x.fillRect(W / 2 - 90, 232, 180, 2); x.font = FT; x.fillStyle = ink; lines.forEach((l, i) => x.fillText(l, W / 2, 360 + i * LH));
-  x.font = '34px "IBM Plex Sans Arabic",sans-serif'; x.fillStyle = br; if (d.src) x.fillText(d.src, W / 2, H - 190);
-  x.fillStyle = ink; x.globalAlpha = .6; x.fillText('أذكاري · qurandua.online', W / 2, H - 120);
-  c.toBlob(async b => { const f = new File([b], 'dua.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f] }); } catch (e) {} }
-    else { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'dua.png'; a.click(); } });
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = FT;
+  m.direction = 'rtl';
+  const lines = [];
+  let cur = '';
+  d.text.split('\n').forEach(par => {
+    cur = '';
+    par.split(' ').forEach(w => {
+      const t = cur ? cur + ' ' + w : w;
+      if (m.measureText(t).width > W - P * 2 && cur) {
+        lines.push(cur);
+        cur = w;
+      } else cur = t;
+    });
+    lines.push(cur);
+  });
+  const LH = 108, H = Math.max(1350, 420 + lines.length * LH + 260), c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const x = c.getContext('2d');
+  x.direction = 'rtl';
+  x.textAlign = 'center';
+  x.fillStyle = bg;
+  x.fillRect(0, 0, W, H);
+  x.strokeStyle = br;
+  x.lineWidth = 4;
+  x.strokeRect(44, 44, W - 88, H - 88);
+  x.lineWidth = 1.5;
+  x.strokeRect(62, 62, W - 124, H - 124);
+  x.fillStyle = br;
+  x.font = '700 70px "Amiri",serif';
+  x.fillText(d.title, W / 2, 190);
+  x.fillRect(W / 2 - 90, 232, 180, 2);
+  x.font = FT;
+  x.fillStyle = ink;
+  lines.forEach((l, i) => x.fillText(l, W / 2, 360 + i * LH));
+  x.font = '34px "IBM Plex Sans Arabic",sans-serif';
+  x.fillStyle = br;
+  if (d.src) x.fillText(d.src, W / 2, H - 190);
+  x.fillStyle = ink;
+  x.globalAlpha = .6;
+  x.fillText('أذكاري · qurandua.online', W / 2, H - 120);
+  c.toBlob(async b => {
+    const f = new File([b], 'dua.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      try {
+        await navigator.share({ files: [f] });
+      } catch (e) {
+      }
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = 'dua.png';
+      a.click();
+    }
+  });
 }
-const EMO = /[\p{Extended_Pictographic}\uFE0F\u200D]/gu;
-function cleanIcons(root) {
-  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), L = []; let n;
-  while ((n = w.nextNode())) {
-    const p = n.parentElement; if (!p || p.closest('script,style,textarea,input,.chat-bubble,.duaa-text,.hero-moon,.nav-logo')) continue;
-    const t = n.nodeValue; EMO.lastIndex = 0; if (!EMO.test(t)) continue; EMO.lastIndex = 0;
-    const v = t.replace(EMO, '').replace(/^\s+/, ''); if (v.trim()) L.push([n, v]);
-  }
-  L.forEach(([n, v]) => { n.nodeValue = v; });
-}
-window.addEventListener('load', () => { cleanIcons(document.body); new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) cleanIcons(n); else if (n.nodeType === 3 && n.parentElement) cleanIcons(n.parentElement); }))).observe(document.body, { childList: true, subtree: true }); });
 Object.assign(window, { setTheme, markTheme, addCustomDua, delCustom, speakDua, shareDuaImage });
-
-// ═══ حارس التباين: لا يختفي أي نص في أي وضع ═══
 (function () {
-  const P = s => { const m = s.match(/[\d.]+/g); return m ? m.map(Number) : [0, 0, 0, 1]; };
-  const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }, lum = c => .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]);
-  const bgOf = e => { for (let n = e; n && n.nodeType === 1; n = n.parentElement) { const s = getComputedStyle(n), c = P(s.backgroundColor), al = c.length < 4 ? 1 : c[3]; if (s.backgroundImage !== 'none' && al < .95) return null; if (al >= .95) return c; } return [255, 255, 255]; };
+  const P = s => {
+    const m = s.match(/[\d.]+/g);
+    return m ? m.map(Number) : [0, 0, 0, 1];
+  };
+  const f = v => {
+    v /= 255;
+    return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4);
+  }, lum = c => .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]);
+  const bgOf = e => {
+    for (let n = e; n && n.nodeType === 1; n = n.parentElement) {
+      const s = getComputedStyle(n), c = P(s.backgroundColor), al = c.length < 4 ? 1 : c[3];
+      if (s.backgroundImage !== 'none' && al < .95) return null;
+      if (al >= .95) return c;
+    }
+    return [255, 255, 255];
+  };
   let t;
   function guard() {
-    document.querySelectorAll('[data-cg]').forEach(e => { e.style.removeProperty('color'); e.removeAttribute('data-cg'); });
-    document.querySelectorAll('.tab-content.active *,.overlay:not(.hidden) *,.tasbih-overlay:not(.hidden) *,.nur-ov *,.navbar *,.prayer-bar *').forEach(e => {
+    document.querySelectorAll('[data-cg]').forEach(e => {
+      e.style.removeProperty('color');
+      e.removeAttribute('data-cg');
+    });
+    document.querySelectorAll('.tab-content.active *,.overlay:not(.hidden) *,.tasbih-overlay:not(.hidden) *,.sheet-ov *,.navbar *,.prayer-bar *').forEach(e => {
       if (e.closest('.ti,.nav-btn') || ![...e.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim())) return;
-      const s = getComputedStyle(e); if (s.visibility === 'hidden' || s.display === 'none') return;
-      const bg = bgOf(e); if (!bg) return; const fg = P(s.color), a = fg.length < 4 ? 1 : fg[3];
+      const s = getComputedStyle(e);
+      if (s.visibility === 'hidden' || s.display === 'none') return;
+      const bg = bgOf(e);
+      if (!bg) return;
+      const fg = P(s.color), a = fg.length < 4 ? 1 : fg[3];
       const L1 = lum(fg), L2 = lum(bg), cr = (Math.max(L1, L2) + .05) / (Math.min(L1, L2) + .05);
-      if (cr < 2.6 || a < .4) { e.style.setProperty('color', L2 > .4 ? '#13264a' : '#f6efdc', 'important'); e.setAttribute('data-cg', '1'); }
+      if (cr < 2.6 || a < .4) {
+        e.style.setProperty('color', L2 > .4 ? '#13264a' : '#f6efdc', 'important');
+        e.setAttribute('data-cg', '1');
+      }
     });
   }
-  const run = () => { clearTimeout(t); t = setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(guard) : guard()), 350); };
+  const run = () => {
+    clearTimeout(t);
+    t = setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(guard) : guard()), 350);
+  };
   window.addEventListener('load', run);
   new MutationObserver(run).observe(document.body, { attributes: true, subtree: true, childList: true, attributeFilter: ['class'] });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', run); window.runGuard = run;
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', run);
+  window.runGuard = run;
 })();
-
-// ═══ غلاف التطبيق: يثبت على قياس الشاشة ويتأقلم مع أي حجم ═══
+// غلاف التطبيق: يثبت على قياس الشاشة ويتأقلم مع أي حجم
 (function () {
   const de = document.documentElement, vv = window.visualViewport;
   const fit = () => de.style.setProperty('--app-h', (vv ? vv.height : innerHeight) + 'px');
-  fit(); addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 250)); if (vv) vv.addEventListener('resize', fit);
+  fit();
+  addEventListener('resize', fit);
+  addEventListener('orientationchange', () => setTimeout(fit, 250));
+  if (vv) vv.addEventListener('resize', fit);
   if (IS_STANDALONE) de.classList.add('standalone');
   document.addEventListener('gesturestart', e => e.preventDefault());
-  const _g = window.go; window.go = function (t) { _g(t); const m = document.querySelector('.main'); if (m) m.scrollTo({ top: 0 }); };
+  const _g = window.go;
+  window.go = function (t) {
+    _g(t);
+    const m = document.querySelector('.main');
+    if (m) m.scrollTo({ top: 0 });
+  };
 })();
-
-// ═══ مميزات بصرية: فوانيس + سماء حية بعدّاد الصلاة + شرارات ═══
 (function () {
   const hero = document.querySelector('.hero');
   if (hero) [[7, 70, 0], [27, 120, -1.6], [73, 95, -.8], [93, 150, -2.4]].forEach(([x, len, dl]) => {
-    const f = document.createElement('div'); f.className = 'fan'; f.style.cssText = `left:${x}%;--len:${len}px;--d:${dl}s`; f.innerHTML = '<i></i>'; hero.appendChild(f);
+    const f = document.createElement('div');
+    f.className = 'fan';
+    f.style.cssText = `left:${x}%;--len:${len}px;--d:${dl}s`;
+    f.innerHTML = '<i></i>';
+    hero.appendChild(f);
   });
   const tab = document.getElementById('tab-salah');
-  if (tab && !document.getElementById('nur-sky')) {
-    const el = document.createElement('div'); el.id = 'nur-sky'; el.className = 'nur-sky p-night';
+  if (tab && !document.getElementById('sky-card')) {
+    const el = document.createElement('div');
+    el.id = 'sky-card';
+    el.className = 'sky-card p-night';
     el.innerHTML = '<div class="orb moon" id="sk-orb"></div><div class="sk-body"><div class="sk-lbl">الصلاة القادمة</div><div class="sk-name" id="sk-name">...</div><div class="sk-time" id="sk-cd">--:--:--</div><div class="sk-at" id="sk-at"></div></div><svg class="sk-ring" viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" id="sk-prog" cx="50" cy="50" r="44"/></svg>';
     tab.insertBefore(el, tab.firstChild);
   }
   const NM = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'], KEY = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
   function skyTick() {
-    const el = document.getElementById('nur-sky'); if (!el || typeof prayerTimes === 'undefined' || !prayerTimes) return;
-    const pt = {}; Object.entries(prayerTimes).forEach(([k, v]) => { if (typeof v === 'string') pt[k.toLowerCase()] = v.slice(0, 5); });
+    const el = document.getElementById('sky-card');
+    if (!el || typeof prayerTimes === 'undefined' || !prayerTimes) return;
+    const pt = {};
+    Object.entries(prayerTimes).forEach(([k, v]) => {
+      if (typeof v === 'string') pt[k.toLowerCase()] = v.slice(0, 5);
+    });
     if (!KEY.every(k => pt[k])) return;
-    const T = KEY.map(k => { const [h, m] = pt[k].split(':'); return +h * 60 + +m; }), n = new Date(), nm = n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
+    const T = KEY.map(k => {
+      const [h, m] = pt[k].split(':');
+      return +h * 60 + +m;
+    }), n = new Date(), nm = n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
     const i = T.findIndex(t => t > nm), ni = i < 0 ? 0 : i, nT = i < 0 ? T[0] + 1440 : T[i], pT = i < 0 ? T[4] : (i === 0 ? T[4] - 1440 : T[i - 1]);
     const rem = Math.max(0, Math.round((nT - nm) * 60)), f2 = x => String(x).padStart(2, '0');
-    document.getElementById('sk-name').textContent = NM[ni]; document.getElementById('sk-at').textContent = 'الأذان ' + pt[KEY[ni]];
+    document.getElementById('sk-name').textContent = NM[ni];
+    document.getElementById('sk-at').textContent = 'الأذان ' + pt[KEY[ni]];
     document.getElementById('sk-cd').textContent = f2(Math.floor(rem / 3600)) + ':' + f2(Math.floor(rem % 3600 / 60)) + ':' + f2(rem % 60);
     document.getElementById('sk-prog').style.strokeDashoffset = 276.46 * (1 - Math.min(1, Math.max(0, (nm - pT) / (nT - pT))));
-    el.className = 'nur-sky ' + (i < 0 || i === 0 ? 'p-night' : ['', 'p-morning', 'p-day', 'p-golden', 'p-sunset'][i]);
+    el.className = 'sky-card ' + (i < 0 || i === 0 ? 'p-night' : ['', 'p-morning', 'p-day', 'p-golden', 'p-sunset'][i]);
     const sun = nm >= T[0] && nm < T[3], fr = sun ? (nm - T[0]) / (T[3] - T[0]) : ((nm < T[0] ? nm + 1440 : nm) - T[3]) / (T[0] + 1440 - T[3]);
-    const o = document.getElementById('sk-orb'); o.className = 'orb ' + (sun ? 'sun' : 'moon'); o.style.left = (8 + 76 * fr) + '%'; o.style.top = (58 - 46 * Math.sin(Math.PI * fr)) + '%';
+    const o = document.getElementById('sk-orb');
+    o.className = 'orb ' + (sun ? 'sun' : 'moon');
+    o.style.left = (8 + 76 * fr) + '%';
+    o.style.top = (58 - 46 * Math.sin(Math.PI * fr)) + '%';
   }
-  setInterval(skyTick, 1000); setTimeout(skyTick, 1500);
+  setInterval(skyTick, 1000);
+  setTimeout(skyTick, 1500);
   document.addEventListener('pointerdown', e => {
-    const b = e.target.closest('.dhikr-tap,.tasbih-tap-btn'); if (!b) return; const r = b.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-    for (let k = 0; k < 10; k++) { const s = document.createElement('i'), an = Math.random() * 6.28, di = 40 + Math.random() * 70; s.className = 'spark'; s.style.cssText = `left:${cx}px;top:${cy}px;--dx:${Math.cos(an) * di}px;--dy:${Math.sin(an) * di}px`; document.body.appendChild(s); setTimeout(() => s.remove(), 700); }
+    const b = e.target.closest('.dhikr-tap,.tasbih-tap-btn');
+    if (!b) return;
+    const r = b.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    for (let k = 0; k < 10; k++) {
+      const s = document.createElement('i'), an = Math.random() * 6.28, di = 40 + Math.random() * 70;
+      s.className = 'spark';
+      s.style.cssText = `left:${cx}px;top:${cy}px;--dx:${Math.cos(an) * di}px;--dy:${Math.sin(an) * di}px`;
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 700);
+    }
   });
 })();
